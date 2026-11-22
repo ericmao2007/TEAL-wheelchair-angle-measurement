@@ -1,10 +1,4 @@
 {
-  "model": {
-    "src": "",
-    "poster": "",
-    "caption": "3D hardware model",
-    "autoRotate": true
-  },
   "video": {
     "src": "",
     "poster": "",
@@ -13,10 +7,5 @@
   "paper": {
     "url": ""
   },
-  "resources": [
-    {
-      "title": "View CAD in Onshape",
-      "url": "https://cad.onshape.com/documents/45da8d6fb973907a2212627a/w/8daeebbf65aadcc1a048f33e/e/8cd29781b890ea344931dde4"
-    }
-  ]
+  "resources": []
 }
