@@ -55,7 +55,7 @@
     <div class="prototype-grid">
       <article><figure class="prototype-image"><img src="assets/cart-prototype.png" alt="Early cart prototype carrying a BNO055 sensor and Arduino wiring" loading="lazy" width="1536" height="1024"></figure><h3>Early sensor platform</h3><p>A BNO055 IMU connected to an Arduino measured running and cross slope on a small cart. The poster identifies sensor accuracy and mounting unsteadiness as problems in the early design.</p></article>
       <article><figure class="prototype-image"><img src="assets/wheelchair-prototype.png" alt="Battery-powered sensor prototype mounted to a wheelchair" loading="lazy" width="1298" height="1212"></figure><h3>Wheelchair mounting</h3><p>A BNO086 IMU and ESP32, powered by a battery pack, moved the system onto the wheelchair frame. This stage explored mounting effectiveness and app-based readings.</p></article>
-      <article><figure class="prototype-image app-image"><img src="assets/teal-app.png" alt="TEAL Tilt Android interface showing running slope, cross slope, relative zero controls, and a 3D orientation view" loading="lazy" width="945" height="2048"></figure><h3>Measurement interface</h3><p>The Android app brings together 180° calibration, GPS tracking, and data recording. The interface displays both running and cross slope, with an optional orientation view.</p></article>
+      <article><figure class="prototype-image app-image"><img src="assets/intermediate-app.png" alt="Intermediate Android app with a single Pitch reading, Grade, and a 3D orientation view" loading="lazy" width="629" height="1536"></figure><h3>Early app interface</h3><p>The intermediate app displayed a single Pitch reading, Grade, and a 3D orientation view. This stage explored an intuitive interface for calibration, GPS tracking, and measurement recording.</p></article>
     </div>
   </section>
 
@@ -64,6 +64,10 @@
     <div class="final-prototype">
       <figure class="pcb-image"><img src="assets/custom-pcb.png" alt="Custom circuit board design connecting the ESP32-S3 and BNO086" loading="lazy" width="1636" height="1418"><figcaption>Custom PCB design from the project poster</figcaption></figure>
       <div><h3>Hardware</h3><p>The poster’s final design connects a BNO086 IMU and an ESP32-S3 on a custom PCB. A protective enclosure holds the electronics on a stable wheelchair mount. This repository contains the XIAO ESP32S3 firmware implementation.</p><h3>Software</h3><p>TEAL Tilt receives slope measurements over Bluetooth Low Energy, filters readings, and associates them with the phone’s GPS location. The app displays recorded slopes on a map and exports CSV or HTML files. A laptop viewer supports logging and diagnostics.</p></div>
+    </div>
+    <div class="final-prototype final-interface">
+      <figure class="final-app-image"><img src="assets/teal-app.png" alt="Final TEAL Tilt interface showing running slope, cross slope, relative zero controls, and a 3D orientation view" loading="lazy" width="945" height="2048"><figcaption>Final measurement interface from the project poster</figcaption></figure>
+      <div><p class="eyebrow">FINAL SOFTWARE</p><h3>Measurement interface</h3><p>The final TEAL Tilt interface displays running slope and cross slope side by side, with both gradient and angle readings. Relative zero controls and an optional 3D orientation view support measurement review.</p><p>The app combines 180° calibration, GPS tracking, and data recording with map visualization and CSV or HTML export.</p></div>
     </div>
     <div class="pipeline" aria-label="Measurement pipeline"><span>BNO086 IMU</span><span>ESP32-S3 + BLE</span><span>Android + phone GPS</span><span>Map + CSV / HTML</span></div>
   </section>

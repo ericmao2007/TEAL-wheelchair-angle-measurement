@@ -13,3 +13,5 @@ The website follows the poster's title, authors, Duke project context, prototype
 - The source includes an unfilled final-hardware photograph placeholder and a repeated PCB caption under an app screenshot. The website uses descriptive image captions and does not present the intermediate wheelchair photo as a completed final assembly.
 - 3D and video sections remain placeholders with the existing local-preview and configured-media functionality.
 - The ADA project title expresses the intended surveying application. It does not certify compliance.
+
+- App screenshots follow the poster placement and project-owner clarification: the single-Pitch screenshot on the left is intermediate, while the dual-axis TEAL Tilt screenshot on the right is the final measurement interface.
