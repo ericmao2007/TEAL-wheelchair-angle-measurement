@@ -1,11 +1,123 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="An open hardware and software project for wheelchair tilt and slope measurement using XIAO ESP32S3, BNO086, and Bluetooth Low Energy."><title>Wheelchair Angle Measurement — Project</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script></head>
-<body><header class="topbar"><a class="brand" href="#">WAM<span> / Research & development</span></a><nav aria-label="Main navigation"><a href="#overview">Overview</a><a href="#system">System</a><a href="#model">3D model</a><a href="#resources">Resources</a></nav></header>
-<main><section class="hero"><p class="eyebrow">OPEN HARDWARE · EMBEDDED SENSING · ACCESSIBILITY</p><h1>Wheelchair<br>Angle Measurement<span class="period">.</span></h1><p class="subtitle">A connected sensing platform for exploring wheelchair tilt and terrain slope.</p><p class="byline">XIAO ESP32S3 &nbsp;/&nbsp; BNO086 IMU &nbsp;/&nbsp; Android + BLE</p><div class="actions"><a class="button primary" href="https://github.com/ericmao2007/wheelchair-angle-measurement">View code <span aria-hidden="true">&lt;/&gt;</span></a><a class="button" href="#demo">Explore demo</a><a class="button" id="paper-link" hidden>Read paper</a></div><p class="project-note">An ongoing engineering project. Paper, hardware models, and demonstration media will be added here.</p>
-<div class="system-graphic" role="img" aria-label="BNO086 inertial sensor sends orientation to XIAO ESP32S3, which streams via Bluetooth to an Android app and laptop viewer"><div class="graphic-grid"></div><div class="sensor-chip"><span class="chip-label">INERTIAL SENSING</span><strong>BNO086</strong><span>6-axis fusion</span><div class="axes"><i>X</i><i>Y</i><i>Z</i></div></div><div class="connection"><span>SPI</span><b></b></div><div class="processor"><span class="chip-label">EMBEDDED DEVICE</span><strong>XIAO<br>ESP32S3</strong><span>Orientation + BLE</span></div><div class="connection"><span>BLE</span><b></b></div><div class="readout"><span class="chip-label">COMPANION INTERFACES</span><strong>Measure.<br>Map. Review.</strong><span>Android / Laptop</span></div><p class="diagram-caption">System architecture · schematic illustration</p></div></section>
-<section id="overview" class="text-section"><div class="section-label">Overview</div><div><h2>From orientation to<br>an understandable reading.</h2><p class="lead">Wheelchair Angle Measurement connects an inertial sensor, a compact microcontroller, and companion interfaces to display tilt and slope information.</p><p>The BNO086 supplies internally fused six-axis orientation. The ESP32S3 streams measurements over Bluetooth Low Energy, while the Android app and laptop viewer provide angle, grade, calibration controls, and diagnostic views. The Android app also supports GPS-linked measurement sessions and exports.</p><p class="note">This page documents a prototype. Absolute accuracy, long-term drift, and field repeatability require physical validation with a reference fixture. No performance results are claimed here.</p></div></section>
-<section id="system"><div class="section-heading"><div><p class="eyebrow">THE PLATFORM</p><h2>A small device.<br>A complete measurement pipeline.</h2></div><a class="text-link" href="https://github.com/ericmao2007/wheelchair-angle-measurement#current-hardware-xiao-esp32s3--bno086-spi">Hardware & wiring</a></div><div class="components"><article><span class="tag">HARDWARE</span><h3>Sense & transmit</h3><p>XIAO ESP32S3 and BNO086 over SPI. Six-axis chip fusion uses acceleration and gyroscope measurements without magnetic heading.</p><code>src/main.cpp</code></article><article><span class="tag">ANDROID</span><h3>Measure in context</h3><p>Live tilt and grade, IMU calibration, reversal zeroing, GPS-linked sessions, offline map support, and data export.</p><code>android-app/</code></article><article><span class="tag">DESKTOP</span><h3>Inspect & record</h3><p>A browser-based laptop viewer and Python BLE bridge for live readings, CSV logging, and diagnostic analysis.</p><code>laptop/</code></article></div></section>
-<section id="model" class="media-section"><div class="section-heading"><div><p class="eyebrow">HARDWARE EXPLORER</p><h2>The device, in three dimensions.</h2></div><span class="status">Model coming soon</span></div><div id="model-stage" class="model-stage"><div class="empty-state"><svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><path d="m50 12 33 19v38L50 88 17 69V31zM17 31l33 19 33-19M50 50v38M33 22l34 19v38"/></svg><h3>A closer look, coming soon.</h3><p>The interactive viewer is ready for a GLB or glTF model.<br>Rotate, zoom, and inspect the hardware once it is added.</p></div></div><div class="media-toolbar"><p id="model-caption">3D hardware model · awaiting upload</p><div><button class="button small" id="choose-model" type="button">Preview local .glb</button><input id="model-file" type="file" accept=".glb" hidden><button id="rotate-model" class="button small" hidden>Pause rotation</button><button id="reset-model" class="button small" hidden>Reset view</button></div></div><p id="model-feedback" class="note" aria-live="polite">Local previews stay in your browser and are not published.</p></section>
-<section id="demo" class="media-section"><div class="section-heading"><div><p class="eyebrow">IN THE FIELD</p><h2>See the system in use.</h2></div><span class="status">Demo coming soon</span></div><div id="video-stage" class="video-stage"><div class="empty-state"><span class="play-icon" aria-hidden="true">▷</span><h3>Room for the real demonstration.</h3><p>A walkthrough of the device, app, and measurement process will appear here.</p></div></div><div class="media-toolbar"><p id="video-caption">Demonstration video · awaiting upload</p><button class="button small" id="choose-video" type="button">Preview local video</button><input id="video-file" type="file" accept="video/*" hidden></div><p class="note">Local video previews are not uploaded or saved.</p></section>
-<section id="results" class="text-section"><div class="section-label">Evaluation</div><div><h2>Built to be tested.</h2><p>Software checks cover orientation conversion, data transport, filtering, and interface behavior. Physical evaluation is a separate step.</p><div class="evaluation"><div><strong>Stationary drift</strong><span>Results to be added</span></div><div><strong>Return-position repeatability</strong><span>Results to be added</span></div><div><strong>Reference-angle comparison</strong><span>Results to be added</span></div></div><a class="text-link" href="https://github.com/ericmao2007/wheelchair-angle-measurement/blob/main/diagnostics/VALIDATION.md">Read validation notes</a></div></section>
-<section id="resources"><div class="section-heading"><div><p class="eyebrow">BUILD ON THE PROJECT</p><h2>Open code. Clear starting points.</h2></div></div><div class="resources"><a href="https://github.com/ericmao2007/wheelchair-angle-measurement"><span>REPOSITORY</span><h3>Source code</h3><p>Firmware, Android app, viewer, and tests.</p></a><a href="https://github.com/ericmao2007/wheelchair-angle-measurement/blob/main/README.md"><span>DOCUMENTATION</span><h3>Build & setup</h3><p>Hardware wiring, PlatformIO, and BLE workflow.</p></a><a href="https://github.com/ericmao2007/wheelchair-angle-measurement/tree/main/android-app"><span>COMPANION APP</span><h3>Android project</h3><p>App source, build instructions, and validation.</p></a></div><div id="extra-resources"></div><div class="paper-note"><strong>Paper & citation</strong><p>A manuscript and citation will be added when available.</p></div></section></main><footer><a class="brand" href="#">Wheelchair Angle Measurement</a><p>Project documentation · <a href="https://github.com/ericmao2007/wheelchair-angle-measurement">GitHub</a></p></footer></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A Duke engineering project for wheelchair-mounted slope measurement, with an Android app for GPS-linked incline data. By Allison Ding, Wenqing (Eric) Mao, Liam Turner, and Zhuoyang (Tony) Lin.">
+  <meta name="theme-color" content="#079798">
+  <title>Wheelchair Slope Incline Measurement for ADA Compliance</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#">TEAL <span>Wheelchair Slope Measurement</span></a>
+  <nav aria-label="Main navigation">
+    <a href="#overview">Background</a><a href="#system">Prototype</a><a href="#results">Testing</a><a href="#resources">Resources</a>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">DUKE PRATT SCHOOL OF ENGINEERING / THE FOUNDRY</p>
+    <h1>Wheelchair Slope<br>Incline Measurement<br><span>for ADA Compliance</span></h1>
+    <p class="subtitle">Measuring campus inclines from a wheelchair, with less handling and better information for accessible travel.</p>
+    <p class="authors">Allison Ding, Wenqing (Eric) Mao,<br class="mobile-break"> Liam Turner, Zhuoyang (Tony) Lin</p>
+    <div class="actions">
+      <a class="button primary" href="https://docs.google.com/presentation/d/1u4u2loXcCnUZt13ERQBUPNVVRGNxF7v4/edit">View project poster</a>
+      <a class="button" href="https://github.com/ericmao2007/wheelchair-angle-measurement">Source code</a>
+      <a class="button" href="#demo">Demonstration</a>
+      <a class="button" id="paper-link" hidden>Read paper</a>
+    </div>
+    <div class="hero-feature">
+      <div class="hero-copy">
+        <span class="eyebrow">DESIGNED AROUND THE USER</span>
+        <h2>Slope data.<br>From the wheelchair.</h2>
+        <p>A mounted inertial sensor sends running and cross-slope readings to an Android app. The app pairs measurements with phone GPS, maps recorded slopes, and exports data for review.</p>
+        <a class="text-link" href="#system">Explore the final prototype</a>
+      </div>
+      <figure class="hero-image"><img src="assets/wheelchair-prototype.png" alt="Intermediate wheelchair prototype with orange sensor mounting hardware" width="1298" height="1212"><figcaption>Wheelchair-mounted prototype pictured in the project poster</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="overview" class="text-section">
+    <div class="section-label">Background and motivation</div>
+    <div>
+      <h2>Campus accessibility,<br>measured on the move</h2>
+      <p class="lead">The project supports Chris Sparrow, Duke University’s Director of Physical Accessibility, in collecting incline information about campus pathways.</p>
+      <p>The project poster describes the difficulty of surveying a large campus with a handheld digital level. For a wheelchair user, taking measurements on a slope can mean letting go of the wheelchair to handle the instrument.</p>
+      <div class="problem-statement"><h3>Problem statement</h3><p>Develop a device that repeatedly measures inclines from a wheelchair, reduces the need to handle equipment on slopes, and helps the client provide better pathway information to other wheelchair users.</p></div>
+      <p class="note">The system supports accessibility surveying. The project title describes its intended application, rather than a certification of ADA compliance.</p>
+    </div>
+  </section>
+
+  <section id="prototypes">
+    <div class="section-heading"><div><p class="eyebrow">DESIGN DEVELOPMENT</p><h2>Intermediate prototypes</h2></div></div>
+    <div class="prototype-grid">
+      <article><figure class="prototype-image"><img src="assets/cart-prototype.png" alt="Early cart prototype carrying a BNO055 sensor and Arduino wiring" loading="lazy" width="1536" height="1024"></figure><h3>Early sensor platform</h3><p>A BNO055 IMU connected to an Arduino measured running and cross slope on a small cart. The poster identifies sensor accuracy and mounting unsteadiness as problems in the early design.</p></article>
+      <article><figure class="prototype-image"><img src="assets/wheelchair-prototype.png" alt="Battery-powered sensor prototype mounted to a wheelchair" loading="lazy" width="1298" height="1212"></figure><h3>Wheelchair mounting</h3><p>A BNO086 IMU and ESP32, powered by a battery pack, moved the system onto the wheelchair frame. This stage explored mounting effectiveness and app-based readings.</p></article>
+      <article><figure class="prototype-image app-image"><img src="assets/teal-app.png" alt="TEAL Tilt Android interface showing running slope, cross slope, relative zero controls, and a 3D orientation view" loading="lazy" width="945" height="2048"></figure><h3>Measurement interface</h3><p>The Android app brings together 180° calibration, GPS tracking, and data recording. The interface displays both running and cross slope, with an optional orientation view.</p></article>
+    </div>
+  </section>
+
+  <section id="system">
+    <div class="section-heading"><div><p class="eyebrow">FINAL PROTOTYPE</p><h2>Mounted sensing.<br>Connected measurements.</h2></div><a class="text-link" href="https://github.com/ericmao2007/wheelchair-angle-measurement#current-hardware-xiao-esp32s3--bno086-spi">Firmware and wiring</a></div>
+    <div class="final-prototype">
+      <figure class="pcb-image"><img src="assets/custom-pcb.png" alt="Custom circuit board design connecting the ESP32-S3 and BNO086" loading="lazy" width="1636" height="1418"><figcaption>Custom PCB design from the project poster</figcaption></figure>
+      <div><h3>Hardware</h3><p>The poster’s final design connects a BNO086 IMU and an ESP32-S3 on a custom PCB. A protective enclosure holds the electronics on a stable wheelchair mount. This repository contains the XIAO ESP32S3 firmware implementation.</p><h3>Software</h3><p>TEAL Tilt receives slope measurements over Bluetooth Low Energy, filters readings, and associates them with the phone’s GPS location. The app displays recorded slopes on a map and exports CSV or HTML files. A laptop viewer supports logging and diagnostics.</p></div>
+    </div>
+    <div class="pipeline" aria-label="Measurement pipeline"><span>BNO086 IMU</span><span>ESP32-S3 + BLE</span><span>Android + phone GPS</span><span>Map + CSV / HTML</span></div>
+  </section>
+
+  <section id="results">
+    <div class="section-heading"><div><p class="eyebrow">DESIGN CRITERIA AND TESTING</p><h2>Final prototype results</h2></div><a class="text-link" href="https://docs.google.com/presentation/d/1u4u2loXcCnUZt13ERQBUPNVVRGNxF7v4/edit">Results source: project poster</a></div>
+    <p class="results-intro">The table below transcribes the team’s reported prototype tests. GPS localization exceeded the target error and remains the main limitation.</p>
+    <div class="table-scroll" role="region" aria-label="Design criteria and test results" tabindex="0">
+      <table><caption>Targets and results reported in the project poster</caption><thead><tr><th scope="col">Design objective</th><th scope="col">Target</th><th scope="col">Reported test result</th><th scope="col">Outcome</th></tr></thead><tbody>
+        <tr><th scope="row">Accuracy</th><td>Angle: &lt;1% error<br>GPS: &lt;10 m from actual location</td><td>Angle: approximately 0.14% error (grade difference)<br>GPS: 23.08 m average error across 10 locations</td><td><span class="outcome marginal">Marginal</span></td></tr>
+        <tr><th scope="row">Ease of use</th><td>Setup in &lt;3 minutes</td><td>40.45 seconds average across 12 participants</td><td><span class="outcome">Pass</span></td></tr>
+        <tr><th scope="row">Safety</th><td>No device readjustment during a run</td><td>Zero adjustments during ten 10-meter runs</td><td><span class="outcome">Pass</span></td></tr>
+        <tr><th scope="row">Portability</th><td>Weight &lt;1 lb</td><td>Final weight: 0.925 lb</td><td><span class="outcome">Pass</span></td></tr>
+        <tr><th scope="row">Battery life</th><td>&gt;12 hours</td><td>&gt;24 hours</td><td><span class="outcome">Pass</span></td></tr>
+        <tr><th scope="row">Cost</th><td>&lt;$100</td><td>Approximately $95</td><td><span class="outcome">Pass</span></td></tr>
+      </tbody></table>
+    </div>
+    <p class="note">The poster labels the angle metric “error (grade difference).” It does not provide the raw data or a full error calculation, so the value is reproduced as reported and is not converted to absolute angular accuracy. Repository software checks are documented separately in the <a href="https://github.com/ericmao2007/wheelchair-angle-measurement/blob/main/diagnostics/VALIDATION.md">validation notes</a>.</p>
+  </section>
+
+  <section id="discussion" class="text-section">
+    <div class="section-label">Discussion and future plans</div>
+    <div><h2>A more adaptable mount.<br>Better location data.</h2><p>The poster reports that the prototype met the other design criteria while GPS fell short of its target. The team observed better location behavior while moving, although the reported GPS test used stationary locations.</p><p>Future work focuses on a mounting method that accommodates more wheelchair models. The intended next use is to help the client map inclines across Duke’s campus.</p></div>
+  </section>
+
+  <section id="model" class="media-section">
+    <div class="section-heading"><div><p class="eyebrow">HARDWARE EXPLORER</p><h2>Interactive 3D model</h2></div><span class="status">Model coming soon</span></div>
+    <div id="model-stage" class="model-stage"><div class="empty-state"><span class="placeholder-symbol" aria-hidden="true">3D</span><h3>Hardware model to be added</h3><p>The viewer supports rotation and zoom once a GLB or glTF model is available.</p></div></div>
+    <div class="media-toolbar"><p id="model-caption">3D hardware model · awaiting upload</p><div><button class="button small" id="choose-model" type="button">Preview local .glb</button><input id="model-file" type="file" accept=".glb" hidden><button id="rotate-model" class="button small" hidden>Pause rotation</button><button id="reset-model" class="button small" hidden>Reset view</button></div></div>
+    <p id="model-feedback" class="note" aria-live="polite">Local previews stay in your browser and are not published.</p>
+  </section>
+
+  <section id="demo" class="media-section">
+    <div class="section-heading"><div><p class="eyebrow">SYSTEM WALKTHROUGH</p><h2>Demonstration</h2></div><span class="status">Demo coming soon</span></div>
+    <div id="video-stage" class="video-stage"><div class="empty-state"><span class="play-icon" aria-hidden="true">▷</span><h3>Demonstration video to be added</h3><p>This space is ready for the wheelchair setup, calibration, and data-collection walkthrough.</p></div></div>
+    <div class="media-toolbar"><p id="video-caption">Demonstration video · awaiting upload</p><button class="button small" id="choose-video" type="button">Preview local video</button><input id="video-file" type="file" accept="video/*" hidden></div>
+    <p class="note">Local video previews are not uploaded or saved.</p>
+  </section>
+
+  <section id="resources">
+    <div class="section-heading"><div><p class="eyebrow">PROJECT MATERIALS</p><h2>Poster, code, and documentation</h2></div></div>
+    <div class="resources">
+      <a href="https://docs.google.com/presentation/d/1u4u2loXcCnUZt13ERQBUPNVVRGNxF7v4/edit"><span>RESEARCH POSTER</span><h3>Project overview</h3><p>Background, prototypes, design criteria, and reported results.</p></a>
+      <a href="https://github.com/ericmao2007/wheelchair-angle-measurement"><span>SOURCE CODE</span><h3>GitHub repository</h3><p>ESP32 firmware, Android app, laptop viewer, and tests.</p></a>
+      <a href="https://github.com/ericmao2007/wheelchair-angle-measurement/blob/main/README.md"><span>DOCUMENTATION</span><h3>Build and setup</h3><p>Hardware wiring, calibration, and the BLE workflow.</p></a>
+    </div>
+    <div id="extra-resources"></div>
+    <div class="paper-note"><strong>Paper and citation</strong><p>A manuscript and citation will be added when available. The project poster is linked above.</p></div>
+  </section>
+
+  <section id="acknowledgements" class="text-section">
+    <div class="section-label">Acknowledgements</div><div><h2>With thanks to</h2><ul class="thanks"><li>Chris Sparrow, Duke University</li><li>Professor Rebecca Simmons and Professor Stefano Curtarolo, Duke University</li><li>Mckayla Dockam, Mia Gover, Evan Proctor, and Ali Stocks</li><li>Duke Pratt School of Engineering</li></ul></div>
+  </section>
+</main>
+<footer><a class="brand" href="#">TEAL <span>Wheelchair Slope Measurement</span></a><p>Duke engineering project · <a href="https://docs.google.com/presentation/d/1u4u2loXcCnUZt13ERQBUPNVVRGNxF7v4/edit">Poster</a> · <a href="https://github.com/ericmao2007/wheelchair-angle-measurement">GitHub</a></p></footer>
+</body>
+</html>
