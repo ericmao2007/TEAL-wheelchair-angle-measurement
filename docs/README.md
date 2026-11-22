@@ -23,3 +23,7 @@ Empty `src` / `url` values preserve placeholders or hide the paper button. The m
 The 3D viewer loads the pinned `@google/model-viewer` version from unpkg on demand and requires internet access. System fonts are used if web fonts cannot load. Page text and video placeholders do not require third-party scripts.
 
 For local preview, run `python3 -m http.server 8000 --directory docs` from the repository root and visit http://localhost:8000 . Do not open the HTML file directly, because browser restrictions prevent loading its JSON configuration.
+
+## Onshape CAD
+
+The hardware section links to the supplied [Onshape CAD document](https://cad.onshape.com/documents/45da8d6fb973907a2212627a/w/8daeebbf65aadcc1a048f33e/e/8cd29781b890ea344931dde4). Access depends on its Onshape sharing settings. The link opens in a separate tab. The linked page redirects unauthenticated requests to sign-in and disallows external framing, so it is not embedded in an iframe. To display an independent interactive model on this website, add a GLB or glTF export using the model configuration above.
