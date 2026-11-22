@@ -24,14 +24,21 @@ import java.io.IOException;
 
 public final class MainActivity extends Activity implements BleClient.Listener {
     private WebView web;
+    private OfflineTiles vectorTiles;
+    private volatile java.io.File offlineMap;
+    private static final int MAP_REQUEST = 45;
     private BleClient ble;
     private boolean pageReady;
     private boolean foreground;
+    private final android.os.Handler lifecycleHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable pauseBle = () -> { if (!foreground && ble != null) ble.pause(); };
     private boolean pendingConnect;
     private static final String ORIGIN = "https://appassets.androidplatform.net/assets/";
     private static final int PERMISSION_REQUEST = 41;
     private static final int BLUETOOTH_REQUEST = 42;
     private static final int LOCATION_REQUEST = 43;
+    private static final int EXPORT_REQUEST = 44;
+    private String pendingExport;
     private LocationManager locations;
     private boolean locationWanted;
     private boolean locationPermissionPending;
@@ -68,6 +75,8 @@ public final class MainActivity extends Activity implements BleClient.Listener {
             }
             return insets;
         });
+        vectorTiles = new OfflineTiles(getFilesDir());
+        offlineMap = new java.io.File(getFilesDir(), "offline.mbtiles");
         web = new WebView(this);
         web.setBackgroundColor(Color.rgb(11,18,32));
         web.getSettings().setJavaScriptEnabled(true);
@@ -77,6 +86,15 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         web.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         web.getSettings().setMediaPlaybackRequiresUserGesture(true);
         web.addJavascriptInterface(new Bridge(), "LiveTiltAndroid");
+        web.setWebChromeClient(new android.webkit.WebChromeClient() {
+            @Override public boolean onJsConfirm(WebView view, String url, String message, android.webkit.JsResult result) {
+                new android.app.AlertDialog.Builder(MainActivity.this).setMessage(message)
+                        .setPositiveButton("Delete", (dialog, which) -> result.confirm())
+                        .setNegativeButton("Cancel", (dialog, which) -> result.cancel())
+                        .setOnCancelListener(dialog -> result.cancel()).show();
+                return true;
+            }
+        });
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
                 if (r.isForMainFrame() && r.hasGesture()
@@ -88,8 +106,13 @@ public final class MainActivity extends Activity implements BleClient.Listener {
             }
             @Override public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest r) {
                 String url = r.getUrl().toString();
+                if(url.startsWith("https://appassets.androidplatform.net/vector/")){
+                    try{String[] bits=r.getUrl().getPath().split("/");byte[] bytes=vectorTiles.tile(Integer.parseInt(bits[2]),Integer.parseInt(bits[3]),Integer.parseInt(bits[4].replace(".pbf","")),getSharedPreferences("gradient-map",MODE_PRIVATE).getBoolean("online-vector-map",true));return new WebResourceResponse("application/octet-stream",null,new ByteArrayInputStream(bytes));}
+                    catch(Exception e){return new WebResourceResponse("text/plain","UTF-8",404,"Unavailable",null,new ByteArrayInputStream(new byte[0]));}
+                }
+                if(url.startsWith("https://appassets.androidplatform.net/tiles/")) return mapTile(r.getUrl().getLastPathSegment(), r.getUrl().getPath());
                 String path = url.startsWith(ORIGIN) ? url.substring(ORIGIN.length()) : "";
-                if (path.equals("index.html") || path.equals("protocol.js") || path.equals("tracking.js") || path.equals("map.js")) {
+                if (path.equals("index.html") || path.equals("protocol.js") || path.equals("tracking.js") || path.equals("reversal.js") || path.equals("vector.js") || path.equals("map.js") || path.equals("sessions.js")) {
                     try { return new WebResourceResponse(path.endsWith(".js") ? "application/javascript" : "text/html",
                             "UTF-8", getAssets().open(path)); }
                     catch (IOException ignored) { }
@@ -105,6 +128,24 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         ble = new BleClient(this, this);
         locations = (LocationManager) getSystemService(LOCATION_SERVICE);
         web.loadUrl(ORIGIN + "index.html");
+    }
+
+    private WebResourceResponse mapTile(String name, String path) {
+        String[] parts = path.split("/");
+        try {
+            int z=Integer.parseInt(parts[2]), x=Integer.parseInt(parts[3]), y=Integer.parseInt(name.replace(".png", ""));
+            if(z<0||z>19||x<0||x>=(1<<z)||y<0||y>=(1<<z))throw new IOException();
+            if(offlineMap.exists()) {
+                try(android.database.sqlite.SQLiteDatabase db=android.database.sqlite.SQLiteDatabase.openDatabase(offlineMap.getPath(),null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
+                    android.database.Cursor c=db.rawQuery("SELECT tile_data FROM tiles WHERE zoom_level=? AND tile_column=? AND tile_row=?",new String[]{""+z,""+x,""+((1<<z)-1-y)})) {
+                    if(c.moveToFirst()) {byte[] bytes=c.getBlob(0);return new WebResourceResponse(bytes[0]==(byte)0x89?"image/png":"image/jpeg",null,new ByteArrayInputStream(bytes));}
+                }
+            }
+            if(!getSharedPreferences("gradient-map",MODE_PRIVATE).getBoolean("online-vector-map",true))throw new IOException("Offline mode");
+            java.net.HttpURLConnection connection=(java.net.HttpURLConnection)new java.net.URL("https://tile.openstreetmap.org/"+z+"/"+x+"/"+y+".png").openConnection();
+            connection.setRequestProperty("User-Agent","MAO-Slope-Android/1.0");connection.setConnectTimeout(4000);connection.setReadTimeout(4000);
+            try(java.io.InputStream in=connection.getInputStream();java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream()) {byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1)out.write(buffer,0,n);return new WebResourceResponse("image/png",null,new ByteArrayInputStream(out.toByteArray()));}finally{connection.disconnect();}
+        }catch(Exception e){return new WebResourceResponse("text/plain","UTF-8",404,"Unavailable",null,new ByteArrayInputStream(new byte[0]));}
     }
 
     private void connectWithPermission() {
@@ -129,7 +170,7 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         super.onRequestPermissionsResult(request, permissions, results);
         if (request == LOCATION_REQUEST) {
             locationPermissionPending = false;
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (hasLocationPermission()) {
                 if (foreground && locationWanted) startLocation();
             } else {
                 locationWanted = false;
@@ -145,13 +186,47 @@ public final class MainActivity extends Activity implements BleClient.Listener {
     }
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
+        if(request==MAP_REQUEST){
+            if(result!=RESULT_OK||data==null||data.getData()==null)return;
+            final android.net.Uri uri=data.getData();
+            new Thread(()->{
+                String message;
+                java.io.File temp=new java.io.File(getFilesDir(),"import-map.tmp");
+                try(java.io.InputStream in=getContentResolver().openInputStream(uri);java.io.FileOutputStream out=new java.io.FileOutputStream(temp)){
+                    if(in==null)throw new IOException();byte[] buffer=new byte[65536];int n;while((n=in.read(buffer))!=-1)out.write(buffer,0,n);out.flush();
+                    try(android.database.sqlite.SQLiteDatabase db=android.database.sqlite.SQLiteDatabase.openDatabase(temp.getPath(),null,android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
+                        android.database.Cursor c=db.rawQuery("SELECT tile_data FROM tiles LIMIT 1",null)){
+                        if(!c.moveToFirst())throw new IOException();byte[] b=c.getBlob(0);if(b.length<3||!(b[0]==(byte)0x89&&b[1]==0x50||b[0]==(byte)0xff&&b[1]==(byte)0xd8))throw new IOException();
+                    }
+                    if(!temp.renameTo(offlineMap))throw new IOException();message="Offline map imported · No connection needed within its coverage";
+                }catch(Exception e){temp.delete();message="Import failed: choose PNG/JPG raster MBTiles. Your existing map is retained";}
+                final String msg=message;runOnUiThread(()->web.evaluateJavascript("window.onOfflineMapStatus&&window.onOfflineMapStatus("+JSONObject.quote(msg)+")",null));
+            }).start();return;
+        }
+        if (request == EXPORT_REQUEST) {
+            String content = pendingExport; pendingExport = null;
+            if (result != RESULT_OK || data == null || data.getData() == null || content == null) {
+                exportStatus("Export cancelled."); return;
+            }
+            android.net.Uri destination = data.getData();
+            new Thread(() -> {
+                String status;
+                try (java.io.OutputStream out = getContentResolver().openOutputStream(destination, "wt")) {
+                    if (out == null) throw new IOException("No output stream");
+                    out.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    status = "Export saved.";
+                } catch (IOException | SecurityException e) { status = "Could not save export. Please retry."; }
+                final String message = status; runOnUiThread(() -> exportStatus(message));
+            }).start();
+            return;
+        }
         if (request == BLUETOOTH_REQUEST) {
             if (result == RESULT_OK) { pendingConnect = true; if (foreground) { pendingConnect = false; connectWithPermission(); } }
             else onStatus("idle", "Turn on Bluetooth to connect.", "");
         }
     }
     @Override protected void onResume() {
-        super.onResume(); foreground = true;
+        super.onResume(); foreground = true; lifecycleHandler.removeCallbacks(pauseBle);
         if (web != null) web.onResume();
         if (ble != null) ble.resume();
         if (locationWanted) startLocation();
@@ -161,12 +236,12 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         foreground = false;
         if (locations != null) locations.removeUpdates(locationListener);
         locationStatus("Paused in background");
-        if (ble != null) ble.pause();
+        if (ble != null) lifecycleHandler.postDelayed(pauseBle, 30000);
         if (web != null) web.onPause();
         super.onStop();
     }
     @Override protected void onDestroy() {
-        pageReady = false;
+        pageReady = false; lifecycleHandler.removeCallbacks(pauseBle);
         if (ble != null) ble.disconnect();
         if (web != null) { web.removeJavascriptInterface("LiveTiltAndroid"); web.destroy(); web = null; }
         super.onDestroy();
@@ -193,9 +268,13 @@ public final class MainActivity extends Activity implements BleClient.Listener {
     private void locationStatus(String text) {
         evaluate("window.onNativeLocationState(" + JSONObject.quote(text) + ");");
     }
+    private boolean hasLocationPermission() {
+        return checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
     private void startLocation() {
         if (!foreground || !locationWanted) return;
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!hasLocationPermission()) {
             locationStatus("Allow precise location while using the app.");
             if (locationPermissionPending) return;
             locationPermissionPending = true;
@@ -207,6 +286,8 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         boolean started = false;
         try {
             for (String provider : new String[]{LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER}) {
+                if (LocationManager.GPS_PROVIDER.equals(provider)
+                        && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) continue;
                 if (locations.isProviderEnabled(provider)) {
                     locations.requestLocationUpdates(provider, 1000, 0, locationListener);
                     started = true;
@@ -218,7 +299,54 @@ public final class MainActivity extends Activity implements BleClient.Listener {
         }
     }
 
+    private void exportStatus(String text) {
+        evaluate("window.onNativeExportStatus(" + JSONObject.quote(text) + ");");
+    }
     private final class Bridge {
+        @JavascriptInterface public void downloadMap(double latitude,double longitude){
+            if(!vectorTiles.begin())return;
+            new Thread(()->vectorTiles.download(latitude,longitude,text->runOnUiThread(()->{if(web!=null)web.evaluateJavascript("window.onMapDownloadStatus&&window.onMapDownloadStatus("+JSONObject.quote(text)+")",null);}))).start();
+        }
+        @JavascriptInterface public void cancelMapDownload(){vectorTiles.cancel();}
+        @JavascriptInterface public boolean onlineMap(){return getSharedPreferences("gradient-map",MODE_PRIVATE).getBoolean("online-vector-map",true);}
+        @JavascriptInterface public void setOnlineMap(boolean enabled){getSharedPreferences("gradient-map",MODE_PRIVATE).edit().putBoolean("online-vector-map",enabled).apply();}
+        @JavascriptInterface public void importMap(){runOnUiThread(()->{Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.setType("*/*");i.addCategory(Intent.CATEGORY_OPENABLE);try{startActivityForResult(i,MAP_REQUEST);}catch(android.content.ActivityNotFoundException e){onStatus("error","No file picker available","");}});}
+
+        @JavascriptInterface public String loadZero() { return getSharedPreferences("gradient-map", MODE_PRIVATE).getString("reversal-zero", "null"); }
+        @JavascriptInterface public boolean saveZero(String json) {
+            if (json == null || json.length() > 10000) return false;
+            return getSharedPreferences("gradient-map", MODE_PRIVATE).edit().putString("reversal-zero", json).commit();
+        }
+        @JavascriptInterface public boolean deleteSessions(String sessionsJson, String recordsJson) {
+            try {
+                if (sessionsJson.length() > 32000000 || recordsJson.length() > 8000000) return false;
+                new org.json.JSONArray(sessionsJson); new org.json.JSONArray(recordsJson);
+                return getSharedPreferences("gradient-map", MODE_PRIVATE).edit()
+                        .putString("sessions", sessionsJson).putString("records", recordsJson).commit();
+            } catch (org.json.JSONException e) { return false; }
+        }
+        @JavascriptInterface public String loadSessions() {
+            return getSharedPreferences("gradient-map", MODE_PRIVATE).getString("sessions", "");
+        }
+        @JavascriptInterface public boolean saveSessions(String json) {
+            try {
+                if (json.length() > 32000000) return false;
+                org.json.JSONArray sessions = new org.json.JSONArray(json);
+                return getSharedPreferences("gradient-map", MODE_PRIVATE).edit().putString("sessions", sessions.toString()).commit();
+            } catch (org.json.JSONException e) { return false; }
+        }
+        @JavascriptInterface public void exportFile(String name, String mime, String content) {
+            if ((!"text/csv".equals(mime) && !"text/html".equals(mime)) || content == null || content.length() > 32000000) return;
+            runOnUiThread(() -> {
+                if (pendingExport != null) { exportStatus("Finish the current export first."); return; }
+                pendingExport = content;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType(mime).putExtra(Intent.EXTRA_TITLE, name.replaceAll("[^a-zA-Z0-9._-]", "_"));
+                try { startActivityForResult(intent, EXPORT_REQUEST); }
+                catch (android.content.ActivityNotFoundException e) { pendingExport = null; exportStatus("No file picker available."); }
+            });
+        }
+
         @JavascriptInterface public void ready() { runOnUiThread(() -> { pageReady = true; publishState(); }); }
         @JavascriptInterface public void connect() { runOnUiThread(MainActivity.this::connectWithPermission); }
         @JavascriptInterface public void send(String command) { runOnUiThread(() -> ble.send(command)); }

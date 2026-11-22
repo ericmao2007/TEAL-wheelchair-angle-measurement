@@ -1,0 +1,82 @@
+{
+  "name": "MAO_SLOPE",
+  "metadata": "STATIC2:ACCGYRO:FUSION6:BNO086:SH2",
+  "notification_packets": 729,
+  "complete_frames": 81,
+  "valid_frames": 80,
+  "rediscovered_after_disconnect": true,
+  "last": {
+    "protocol": 2,
+    "sequence": 1006,
+    "uptime_ms": 23346,
+    "accel": [
+      -0.375,
+      -0.44140625,
+      9.54296875
+    ],
+    "corrected": [
+      -0.375,
+      -0.44140625,
+      9.54296875
+    ],
+    "filtered_accel": [
+      null,
+      null,
+      null
+    ],
+    "fusion_accel": [
+      -0.3776129484176636,
+      -0.4491174519062042,
+      9.789080619812012
+    ],
+    "has_fusion": true,
+    "gyro": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "mean_accel": [
+      null,
+      null,
+      null
+    ],
+    "magnitude": 9.560528755187988,
+    "noise": null,
+    "drift": null,
+    "roll": -2.6268558502197266,
+    "pitch": 2.206765651702881,
+    "slope": 3.4302730560302734,
+    "grade_x": -3.853438138961792,
+    "grade_y": -4.584533214569092,
+    "grade": 5.994119167327881,
+    "bias": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "temperature": null,
+    "chip_fusion": true,
+    "imu_calibrating": false,
+    "imu_saved": false,
+    "attitude_accuracy": 3,
+    "accel_accuracy": 2,
+    "gyro_accuracy": 3,
+    "valid": true,
+    "calibrating": false,
+    "saved": false,
+    "has_gyro": true,
+    "stable": false,
+    "state": 3,
+    "state_text": "Collecting stability samples",
+    "faces": 0,
+    "sensor_mode": 6,
+    "sensor_status": 59,
+    "sensor_error": 0,
+    "calibration_result": 0
+  }
+}

@@ -39,7 +39,7 @@ public final class BleClient {
     private BluetoothGattCharacteristic telemetry, control;
     private boolean wanted, active = true, scanning, ready, writing;
     private int retry;
-    private long lastFrame;
+    private long lastFrame, lastPacket;
     private String metadata = "";
     private final Runnable scanTimeout = () -> fail("MAO_SLOPE not found. Keep it nearby and disconnect the computer viewer.", true);
     private final Runnable connectTimeout = () -> fail("Bluetooth connection timed out. Retrying…", true);
@@ -48,7 +48,7 @@ public final class BleClient {
     private final Runnable heartbeat = new Runnable() {
         @Override public void run() {
             if (!ready || !wanted || !active) return;
-            if (SystemClock.elapsedRealtime() - lastFrame > 6000) {
+            if (SystemClock.elapsedRealtime() - Math.max(lastFrame, lastPacket) > 30000) {
                 fail("Sensor data stopped. Reconnecting…", true); return;
             }
             handler.postDelayed(this, 1000);
@@ -70,7 +70,7 @@ public final class BleClient {
     public void pause() {
         active = false; cleanup(); listener.onStatus("paused", "", "");
     }
-    public void resume() { active = true; if (wanted) handler.postDelayed(retryTask, 350); }
+    public void resume() { active = true; if (wanted && !ready && gatt == null && !scanning) { handler.removeCallbacks(retryTask); handler.postDelayed(retryTask, 350); } }
 
     private void startScan() {
         if (!wanted || !active) return;
@@ -112,6 +112,7 @@ public final class BleClient {
         if (old != null) { try { old.disconnect(); } catch (RuntimeException ignored) { } try { old.close(); } catch (RuntimeException ignored) { } }
     }
     private void fail(String message, boolean reconnect) {
+        android.util.Log.w("TiltBLE", message);
         cleanup();
         if (!reconnect) wanted = false;
         listener.onStatus(wanted && active ? "retrying" : "error", message, "");
@@ -144,7 +145,7 @@ public final class BleClient {
                     try { if (!device.discoverServices()) fail("Could not discover device services.", true); }
                     catch (SecurityException e) { fail("Bluetooth permission revoked.", false); }
                 } else if (state == BluetoothProfile.STATE_DISCONNECTED || status != BluetoothGatt.GATT_SUCCESS) {
-                    fail("Sensor disconnected. Reconnecting…", true);
+                    fail("Sensor disconnected (GATT " + status + "). Reconnecting…", true);
                 }
             });
         }
@@ -178,7 +179,7 @@ public final class BleClient {
                 if (device != gatt || !CCCD.equals(descriptor.getUuid())) return;
                 if (status != BluetoothGatt.GATT_SUCCESS) { fail("Could not subscribe to sensor data.", true); return; }
                 handler.removeCallbacks(connectTimeout); ready = true; retry = 0;
-                lastFrame = SystemClock.elapsedRealtime();
+                lastPacket = lastFrame = SystemClock.elapsedRealtime();
                 listener.onStatus("ready", "", metadata); handler.postDelayed(heartbeat, 1000);
             });
         }
@@ -220,6 +221,7 @@ public final class BleClient {
     }
     private void handlePacket(BluetoothGatt device, UUID uuid, byte[] value) {
         if (device != gatt || !ready || !TELEMETRY.equals(uuid)) return;
+        lastPacket = SystemClock.elapsedRealtime();
         byte[] payload = assembler.feed(value, SystemClock.elapsedRealtime());
         if (payload != null) { lastFrame = SystemClock.elapsedRealtime(); listener.onFrame(payload); }
     }

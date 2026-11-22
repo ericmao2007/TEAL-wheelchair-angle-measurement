@@ -1,28 +1,50 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'self' data: https://tile.openstreetmap.org"><title>Live Tilt</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https://tile.openstreetmap.org"><title>TEAL Tilt</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#0b1220;color:#e3edf7}*{box-sizing:border-box}body{max-width:960px;margin:0 auto;padding:40px 28px}.connection-controls{display:flex;gap:12px;align-items:center}#connect{font-size:12px;padding:7px 10px}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}h1{font-size:20px;letter-spacing:-.5px;margin:0}#connection{font-size:13px;color:#8fa2b9;display:flex;gap:8px;align-items:center}#connection:before{content:'';width:7px;height:7px;border-radius:50%;background:#8fa2b9}#connection.live{color:#85e4b8}#connection.live:before{background:#85e4b8}.panel{background:#111e30;border:1px solid #293b50;border-radius:18px;padding:32px}.main{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}.label{font-size:13px;color:#8fa2b9}#readingMode{font-size:12px;color:#8fa2b9;margin-bottom:14px}#slope{font-size:clamp(56px,8vw,88px);font-weight:500;letter-spacing:-4px;line-height:1.2;font-variant-numeric:tabular-nums}#grade{font-size:30px;font-variant-numeric:tabular-nums;margin-top:4px}#gradeLabel{margin-top:16px}.axes{display:flex;gap:36px;margin-top:30px}.angle{font-size:24px;margin-top:6px;font-variant-numeric:tabular-nums}canvas{width:100%;height:300px;display:block}.controls{display:flex;gap:10px;align-items:center;margin-top:24px}button{font:inherit;font-size:14px;border:1px solid #364d65;border-radius:9px;padding:11px 18px;background:#1a2d42;color:#e3edf7;cursor:pointer}button.primary{background:#7cddd2;color:#102027;border-color:#7cddd2}button:disabled{opacity:.35;cursor:default}button[hidden]{display:none}#hint{font-size:12px;color:#d8b985;margin-top:18px}#hint:empty{display:none}details{margin-top:22px;border-top:1px solid #293b50;padding-top:18px}summary{font-size:13px;color:#8fa2b9;cursor:pointer}details p{font-size:13px;line-height:1.7;color:#a8b8cb;max-width:680px}#faces{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.face.done{border-color:#7cddd2;color:#7cddd2}.calcontrols{display:flex;gap:8px;flex-wrap:wrap}#calibration,#notice{font-size:13px;line-height:1.6;color:#a8b8cb;margin-top:12px}#notice:empty{display:none}@media(max-width:620px){body{padding:24px 16px}.panel{padding:24px}.main{grid-template-columns:1fr}canvas{height:220px}.axes{margin-top:20px}.controls{margin-top:12px}}
 
 [hidden]{display:none!important}body{padding-bottom:110px}.menu{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#0b1220f5;border-top:1px solid #293b50;z-index:2}.menu button{flex:1;max-width:220px}.menu button[aria-selected="true"]{border-color:#7cddd2;color:#7cddd2;background:#17363d}.gpsbar{margin-top:22px;padding-top:20px;border-top:1px solid #293b50}.gpsbar p,.map-copy{font-size:13px;line-height:1.6;color:#a8b8cb}.gpsbuttons,.maptools{display:flex;gap:8px;flex-wrap:wrap}#captureStatus{font-size:13px;line-height:1.6;color:#85e4b8;margin-top:12px}#gpsStatus{font-size:12px;color:#a8b8cb;line-height:1.5;margin-top:8px}h2{font-size:20px;margin:0}#mapCanvas{height:420px;touch-action:none;border-radius:12px;margin-top:18px;background:#17283c}#mapInfo{min-height:38px;font-size:12px;color:#a8b8cb;margin-top:10px}.maptools{display:grid;grid-template-columns:1fr 1fr 40px 40px}.maptools button{padding:10px 6px;font-size:12px}.attribution{font-size:11px;margin:8px 0;color:#a8b8cb}.attribution a{color:#a8b8cb}#pointDetail{line-height:1.7;font-size:13px;padding:14px;border:1px solid #364d65;border-radius:10px;margin-top:14px;white-space:pre-line}#pointList{display:flex;flex-direction:column;gap:8px;margin-top:16px;max-height:260px;overflow:auto}#pointList button{text-align:left;font-size:13px}.legend{font-size:12px;color:#a8b8cb;margin:12px 0}.legend span{white-space:nowrap;margin-right:12px}@media(max-width:620px){body{padding-bottom:110px}#mapCanvas{height:380px}.map-panel{padding:18px}}
+
+/* Phone layout: CSS pixels follow Android display/font scaling, not panel pixels. */
+html{-webkit-text-size-adjust:100%;scroll-padding-bottom:100px}body{min-width:0}button,summary,input{touch-action:manipulation}button{min-height:48px;line-height:1.3}button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #a6f5e9;outline-offset:3px}button:disabled{opacity:.48}summary{min-height:48px;align-content:center;font-size:14px}#historyStatus,#reverseStatus,#sessionStatus,#gpsStatus,#captureStatus,#pointDetail{overflow-wrap:anywhere}#historyStatus:empty{display:none}.session-row{display:flex;gap:12px;align-items:center;padding:16px 12px;margin-top:10px;border:1px solid #364d65;border-radius:12px;min-height:64px;background:#15263a}.session-row:has(input:checked){border-color:#7cddd2;background:#17363d}.session-row input{width:24px;height:24px;flex:0 0 24px;margin:0;accent-color:#7cddd2}.session-row span{min-width:0;line-height:1.6;overflow-wrap:anywhere}#deleteSelected{color:#ffb8b5;border-color:#87545a}#sessionStatus{min-height:24px;margin:12px 0 0}.gps-options{margin-top:8px;padding-top:0;border-top:0}.gps-options summary{font-size:13px}.gps-options[open] summary{margin-bottom:8px}.gpsbar{background:#152b38;border:1px solid #31515a;border-radius:14px;padding:16px;margin:0 0 20px}.gpsbar p:last-child{margin-bottom:0}.menu{gap:8px}.menu button{min-width:0;font-size:13px;padding:10px 6px}.main>div{min-width:0}
+@media(max-width:620px){
+ body{padding:16px 14px 104px}header{gap:10px;margin-bottom:16px;flex-wrap:wrap}h1{font-size:21px}.connection-controls{margin-left:auto;gap:8px;min-width:0;flex-wrap:wrap;justify-content:flex-end}#connection{font-size:12px;max-width:180px}#connect{min-height:48px;padding:10px 14px;font-size:13px}
+ .panel,.map-panel{padding:18px;border-radius:18px}.main{grid-template-columns:minmax(0,1fr);gap:8px}#readingMode{margin-bottom:6px}#slope{font-size:clamp(64px,19vw,88px);letter-spacing:-3px;line-height:1.1}#gradeLabel{margin-top:12px}#grade{font-size:28px}.axes{gap:0;margin-top:16px}.axes>div{flex:1}.angle{font-size:24px}#scene{height:156px}
+ .controls,.calcontrols,.gpsbuttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.controls button,.calcontrols button,.gpsbuttons button{min-width:0;width:100%;padding:12px 8px;overflow-wrap:anywhere}.controls{margin-top:10px}.gpsbar{padding:14px}#sessionStart,#sessionStop{min-height:52px;font-size:16px;font-weight:650}#gpsToggle,#gpsRetry{font-size:13px}.gpsbar .gpsbuttons:nth-of-type(2){margin-top:12px}.gpsbar p,.map-copy,details p{font-size:13px;line-height:1.6}details{margin-top:16px;padding-top:10px}#reverseStatus{font-size:14px;line-height:1.7;margin-top:12px}#processingStatus{font-size:12px}#faces{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))}#faces[hidden]{display:none!important}
+ .maptools{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 48px 48px;gap:6px}.maptools button{font-size:12px;min-height:48px}#mapCanvas{height:clamp(240px,46dvh,420px)}#pointList{max-height:40dvh}#pointList button{line-height:1.6;padding:12px}.menu{padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:8px}.menu button{min-height:52px;max-width:190px;white-space:normal}#historyPage h2{margin-bottom:8px}#historyList{margin-top:18px}#deleteSelected{grid-column:1 / -1}.session-row{font-size:14px}
+}
+@media(max-width:359px){body{padding-left:10px;padding-right:10px}.panel{padding:14px}header{align-items:flex-start}.connection-controls{gap:6px}#connection{max-width:120px}.maptools{grid-template-columns:1fr 1fr}.menu{padding-left:10px;padding-right:10px;gap:6px}.menu button{font-size:12px}}
+@media(orientation:landscape) and (max-height:500px){body{padding-top:12px}.main{grid-template-columns:1fr 1fr}#scene{height:180px}#mapCanvas{height:230px}.menu{padding-top:6px;padding-bottom:6px}.menu button{min-height:48px}}
+
+.reading-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 18px}.reading-head #readingMode{margin:0;font-size:12px}.reading-head button{font-size:13px;padding:10px 14px}.reading-grid{display:grid;grid-template-columns:70px minmax(0,1fr) minmax(0,1fr);gap:16px 8px;align-items:center;text-align:center;font-variant-numeric:tabular-nums;padding:0 0 20px}.row-label{text-align:left;font-size:13px;color:#a8b8cb}.gradient-value{font-size:clamp(24px,7.5vw,36px);font-weight:550;letter-spacing:-.6px}.angle-value{font-size:clamp(21px,6.5vw,30px)}#axisLeft,#axisRight{font-size:13px;color:#7cddd2}#visualPanel canvas{height:180px}.gpsbar{background:transparent;border:0;border-bottom:1px solid #293b50;border-radius:0;padding:0 0 12px;margin-bottom:12px}#mapCanvas{height:clamp(320px,58dvh,650px)}
+@media(max-width:359px){.reading-grid{grid-template-columns:58px minmax(0,1fr) minmax(0,1fr);gap:14px 5px}.row-label{font-size:12px}.gradient-value{font-size:24px}.angle-value{font-size:21px}}
+
+#calibratePage h3{font-size:15px;margin-top:18px}.cal-demo{border:1px solid #293f52;border-radius:12px;padding:12px;margin:12px 0 16px;background:#0e1a29}.demo-stage{height:165px;position:relative;overflow:hidden;perspective:650px}.demo-surface{position:absolute;left:10%;right:10%;top:100px;height:36px;background:repeating-linear-gradient(90deg,#2b4254 0 1px,transparent 1px 22px);border:1px solid #3d5867;transform:rotateX(58deg)}.demo-object{position:absolute;top:46px;left:calc(50% - 30px);width:60px;height:60px;transform-style:preserve-3d;transform:rotateX(-18deg) rotateY(-24deg);transition:transform 1.6s ease}.demo-object>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:2px solid #85e6d9;background:#24656b;color:#e4fffa;font-size:14px;font-weight:700;backface-visibility:hidden}.cube-back{transform:rotateY(180deg) translateZ(30px)}.cube-left{transform:rotateY(-90deg) translateZ(30px)}.cube-bottom{transform:rotateX(-90deg) translateZ(30px)}.cube-front{transform:translateZ(30px)}.cube-side{transform:rotateY(90deg) translateZ(30px)}.cube-top{transform:rotateX(90deg) translateZ(30px)}.demo-direction{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:11px;color:#9eb4c5}.demo-caption{min-height:76px;margin:14px 0;font-size:13px;line-height:1.7;color:#c0d4df}.demo-controls{display:grid;grid-template-columns:48px minmax(0,1fr) 48px;gap:8px}.demo-controls button{padding:10px 6px;font-size:13px}.demo-imu.pose-1 .demo-object{transform:rotateX(-65deg) rotateY(-24deg)}.demo-faces.pose-0 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateZ(-90deg)}.demo-imu.pose-2 .demo-object{transform:rotateX(65deg) rotateY(-24deg)}.demo-faces.pose-1 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateZ(90deg)}.demo-imu.pose-3 .demo-object{transform:rotateX(-18deg) rotateZ(-90deg)}.demo-faces.pose-2 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateX(-90deg)}.demo-imu.pose-4 .demo-object{transform:rotateX(-18deg) rotateZ(90deg)}.demo-faces.pose-3 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateX(90deg)}.demo-faces.pose-5 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateX(180deg)}.demo-zero.pose-1 .demo-object{transform:rotateX(-18deg) rotateY(-24deg) rotateZ(20deg)}.menu button{font-size:12px;padding-left:3px;padding-right:3px}.menu{gap:6px}@media(prefers-reduced-motion:reduce){.demo-object{transition:none}}
+.reversal-stage svg{display:block;width:100%;height:auto;max-height:220px;font-family:system-ui,sans-serif}.demo-reversal .chair-down{display:none}.demo-reversal.pose-1 .chair-down{display:inline}.demo-reversal.pose-1 .chair-up{display:none}
+#calibratePage details>summary{display:none}#calibratePage details>p{display:none}#calibrationMenu{display:grid;grid-template-columns:1fr;gap:12px}#calibrationMenu button{min-height:64px}#calibrationBack{margin-top:12px}
 </style></head><body>
-<header><h1>Live Tilt</h1><div class="connection-controls"><span id="connection" role="status">Disconnected</span><button id="connect" aria-label="Connect to MAO_SLOPE">Connect</button></div></header>
-<main class="panel" id="measurePage" role="tabpanel" aria-labelledby="measureTab"><div class="main"><div><div id="readingMode">Pitch · absolute</div><div id="slope">—°</div><div class="label" id="gradeLabel">Grade</div><div id="grade">—%</div><div class="axes"><div><div class="label">Roll</div><div class="angle" id="roll">—°</div></div><div><div class="label">Pitch</div><div class="angle" id="pitch">—°</div></div></div></div><canvas id="scene" aria-label="Live 3D tilt; heading not measured"></canvas></div>
+<header><h1>TEAL Tilt</h1><div class="connection-controls"><span id="connection" role="status">Disconnected</span><button id="connect" aria-label="Connect to MAO_SLOPE">Connect</button></div></header>
+<section class="panel" id="startPage"><h2>Ready to measure?</h2><p class="map-copy">Connect your device to set up a measurement, or browse saved data anytime.</p><div class="gpsbuttons"><button id="startConnect" class="primary">Connect Device</button><button id="startHistory">View History</button></div></section>
+<section class="panel" id="setupPage" hidden><p id="setupProgress" class="label"></p><h2 id="setupTitle">Connect device</h2><p id="setupHelp" class="map-copy" role="status"></p><button id="setupConnect" class="primary">Connect Device</button></section>
+<main hidden class="panel" id="measurePage" role="tabpanel" aria-labelledby="measureTab"><section class="gpsbar"><div class="gpsbuttons"><button id="sessionStart" class="primary">Start</button><button id="sessionStop" disabled>Stop</button><button id="forceRecord" disabled style="color:#fa8c88;border-color:#fa8c88">Not recommended · Force record</button><div id="stabilityStatus" role="status">Waiting for sensor · variation is not absolute error</div></div><p id="sessionStatus" role="status">Ready to start a session · auto-save after 3 s within ±0.2°</p><details class="gps-options"><summary>GPS &amp; recording details</summary><div class="gpsbuttons"><button id="gpsToggle" class="primary">Enable GPS</button><button id="gpsRetry" hidden>Retry GPS</button></div><div id="gpsStatus" role="status">GPS recording off</div><div id="captureStatus" role="status"></div><p>Auto-save after 3 s within ±0.2° on both axes. GPS accuracy ≤20 m. Nearby points with similar angles are skipped. Records stay on this phone.</p></details></section><div class="reading-head"><span id="readingMode">Absolute</span><button id="swapAxes" aria-label="Swap X and Y columns">X ↔ Y</button></div><div class="reading-grid"><span></span><span id="axisLeft">Running slope · X</span><span id="axisRight">Cross slope · Y</span><span class="row-label">Gradient</span><strong id="gradientLeft" class="gradient-value">—%</strong><strong id="gradientRight" class="gradient-value">—%</strong><span class="row-label">Angle</span><span id="pitch" class="angle-value">—°</span><span id="roll" class="angle-value">—°</span></div>
 <div class="controls"><button class="primary" id="tare" disabled>Set zero</button><button id="untare" hidden>Reset zero</button></div><div id="hint" role="status"></div>
-<details id="reversalPanel"><summary>180° reversal zero · Pitch</summary>
-<p>Place the same face on the same slope, pointing downhill. Capture 5 stable seconds. Turn the device 180° on the slope so it points uphill, keeping the same face against the surface, then capture again. Do not flip it over. Pitch bias = (first + opposite) / 2; slope = |first − opposite| / 2. Keep the same contact position and mounting.</p>
-<div class="calcontrols"><button id="reverseStart">Capture first direction</button><button id="reverseSecond" hidden>Capture opposite · 180°</button><button id="reverseApply" hidden>Apply Pitch zero</button><button id="reverseCancel" hidden>Cancel</button><button id="reverseClear" hidden>Clear reversal zero</button></div>
-<div id="reverseStatus" role="status"></div><p>This corrects Pitch only. You must verify the 180° turn; heading is not measured. The correction lasts for this connection and clears on disconnect, sensor restart or IMU calibration changes. IMU calibration is retained.</p></details>
+<details id="visualPanel" open><summary>3D view</summary><canvas id="scene" aria-label="Live 3D tilt; heading not measured"></canvas></details>
 <div id="processingStatus" class="label" role="status" style="margin-top:16px;line-height:1.7"></div>
-<section class="gpsbar"><div class="gpsbuttons"><button id="gpsToggle" class="primary">Enable GPS recording</button><button id="gpsRetry" hidden>Retry GPS</button></div><div id="gpsStatus" role="status">GPS recording off</div><div id="captureStatus" role="status"></div><p>Auto-save after 5 s within ±0.2° on both axes. GPS accuracy ≤20 m. Nearby points with similar angles are skipped. Records stay on this phone.</p></section>
-<details id="calibrationPanel"><summary>Calibration</summary><div id="imuControls"><p>BNO086: select Start IMU calibration, hold the board still for a few seconds, then hold 4–6 different orientations for a few seconds each. Finish on a firm support. Save when acceleration and gyro accuracy are both High. This calibrates the chip's six-axis fusion. Set zero only changes the display reference.</p><div class="calcontrols"><button id="imuStart">Start IMU calibration</button><button id="imuSave">Save IMU calibration</button></div><div id="imuStatus" role="status"></div></div><p id="legacyCalHelp">Place each sensor axis (+X, −X, +Y, −Y, +Z, −Z) upward on a firm, square support. Start calibration, hold each face still until “Ready”, then select it. Capture all six and save. Calibration is retained after power-off. Set zero only changes the display reference.</p>
-<div class="calcontrols"><button id="calstart">Start calibration</button><button id="cancel" hidden>Cancel</button><button id="save" hidden>Save</button></div><div id="faces" hidden></div><div id="calibration"></div><div id="notice" role="status"></div></details></main>
-<section class="panel map-panel" id="mapPage" role="tabpanel" aria-labelledby="mapTab" hidden><h2>Gradient map <span id="pointCount" class="label">0 points</span></h2><p class="map-copy">Saved pitch and grade at each GPS location. Tap a marker or a saved point for details.</p><div class="maptools"><button id="mapLatest">Latest point</button><button id="mapHere">My location</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><canvas id="mapCanvas" aria-label="Map of saved slope measurements; drag to pan"></canvas><div class="attribution">© <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a></div><div id="mapInfo" role="status"></div><div class="legend"><span style="color:#77dbc5">● |Pitch| &lt;3°</span><span style="color:#f3c567">● 3–8°</span><span style="color:#fa8c88">● ≥8°</span></div><div id="pointDetail" hidden></div><div id="pointList"></div></section>
-<nav class="menu" role="tablist" aria-label="Main menu"><button id="measureTab" role="tab" aria-selected="true" aria-controls="measurePage">01 · Measure</button><button id="mapTab" role="tab" aria-selected="false" aria-controls="mapPage">02 · Map</button></nav>
-<script src="protocol.js"></script><script src="tracking.js"></script><script src="reversal.js"></script><script src="map.js"></script>
+
+</main>
+<section class="panel map-panel" id="mapPage" role="tabpanel" aria-labelledby="mapTab" hidden><h2>Gradient map <span id="pointCount" class="label">0 points</span></h2><p class="map-copy">Saved pitch and grade at each GPS location. Tap a marker or a saved point for details.</p><div class="maptools"><button id="mapLatest">Latest point</button><button id="mapHere">My location</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><button id="onlineMap">Offline mode · Enable online maps</button><button id="downloadMap">Download within 5 km of map center</button><button id="cancelMapDownload">Cancel download</button><div id="mapDownloadStatus" role="status"></div><p class="map-copy">Download while online, then pan and zoom offline. Downloaded maps stay on this phone. Other areas need an internet connection.</p><canvas id="mapCanvas" aria-label="Map of saved slope measurements; drag to pan"></canvas><div class="attribution">OpenFreeMap · © OpenMapTiles · © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a></div><div id="mapLocationStatus" role="status" class="map-copy"></div><div id="mapInfo" role="status"></div><div class="legend"><span style="color:#77dbc5">● |Pitch| &lt;3°</span><span style="color:#f3c567">● 3–8°</span><span style="color:#fa8c88">● ≥8°</span></div><div id="pointDetail" hidden></div><div id="pointList"></div></section>
+<section class="panel" id="historyPage" role="tabpanel" aria-labelledby="historyTab" hidden><h2>History</h2><p class="map-copy">Select sessions to export or delete. Export all includes every saved session. GPS is blank when no fresh precise location was available.</p><div class="gpsbuttons"><button id="exportAllCsv">Export all CSV</button><button id="exportAllHtml">Export all HTML</button><button id="exportSelectedCsv">Selected CSV</button><button id="exportSelectedHtml">Selected HTML</button><button id="deleteSelected">Delete selected</button></div><p id="historyStatus" role="status"></p><p id="historyEmpty" class="map-copy"></p><div id="historyList"></div><section id="sessionDetail" hidden><h3 id="sessionDetailTitle"></h3><button id="sessionMap">View GPS points on map</button><div id="sessionSamples" style="overflow:auto;max-height:50vh"></div></section></section><section class="panel" id="calibratePage" role="tabpanel" aria-labelledby="calibrateTab" hidden><h2 id="calibrationTitle">Calibration</h2><div id="calibrationMenu" class="gpsbuttons" style="margin-top:18px"><button id="chooseSensor">Sensor calibration</button><button id="chooseReversal">180° zero</button><button id="chooseZero">Set zero</button></div><p id="savedCalibration" class="map-copy"></p><button id="calibrationBack" hidden>← Back</button><details id="reversalPanel" open><summary>180° reversal zero · Pitch</summary><div class="cal-demo" id="reversalDemo"><div class="reversal-stage"><svg viewBox="0 0 300 190" role="img" aria-labelledby="wheelchairTitle wheelchairDesc"><title id="wheelchairTitle">Uphill and downhill wheelchair measurement</title><desc id="wheelchairDesc">Two upright side views on the same slope. First face uphill and measure; then face downhill and measure. Both wheels stay on the slope. The drawing does not show a flip.</desc><defs><g id="wheelchairSide" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="125" cy="118" r="24" stroke="#85e6d9" stroke-width="4"/><circle cx="178" cy="133" r="9" stroke="#85e6d9" stroke-width="4"/><path d="M113 81 L117 105 L157 105 L170 130 L183 130 M116 106 L126 118 L163 118" stroke="#c4dce5" stroke-width="4"/><circle cx="132" cy="65" r="10" fill="#c4dce5" stroke="none"/><path d="M129 82 L137 98 L157 101 L168 119 L181 119 M131 87 L151 91" stroke="#c4dce5" stroke-width="7"/></g></defs><path d="M22 171 L278 117 L278 179 L22 179 Z" fill="#203544"/><path d="M22 171 L278 117" stroke="#8da6b8" stroke-width="3"/><g transform="rotate(-12 150 142)"><g class="chair-up"><use href="#wheelchairSide"/></g><g class="chair-down" transform="translate(300 0) scale(-1 1)"><use href="#wheelchairSide"/></g></g><g class="chair-up" fill="#85e6d9"><text x="150" y="23" text-anchor="middle" font-size="15">1 · Face uphill →</text></g><g class="chair-down" fill="#85e6d9"><text x="150" y="23" text-anchor="middle" font-size="15">2 · ← Face downhill</text></g><text x="26" y="54" fill="#9eb4c5" font-size="11">DOWNHILL</text><text x="214" y="54" fill="#9eb4c5" font-size="11">UPHILL</text></svg></div><p class="demo-caption" id="reversalCaption" aria-live="off"></p><div class="demo-controls"><button id="reversalPrev" aria-label="Previous reversal demonstration step">←</button><button id="reversalPlay">Pause demo</button><button id="reversalNext" aria-label="Next reversal demonstration step">→</button></div></div>
+<p>Measure once facing uphill, then once facing downhill on the same slope. Keep the wheelchair upright and the sensor mounting unchanged. The two side views show the measurement positions; turn around on the ground between them. Capture only when still.</p>
+<div class="calcontrols"><button id="reverseStart">Record first angle</button><button id="reverseSecond" hidden>Record opposite & apply</button><button id="reverseCancel" hidden>Cancel</button><button id="reverseClear" hidden>Clear reversal zero</button></div>
+<div id="reverseStatus" role="status"></div><p>Each click records the latest Pitch immediately. Zero offset = (first angle + second angle) / 2; readings subtract this offset. No stability, motion, turn, accuracy or calibration checks. The offset stays until you clear it, replace it. It is saved automatically for future launches. IMU calibration is retained.</p></details><details id="calibrationPanel"><summary>Sensor calibration</summary><div id="imuControls"><h3>IMU · BNO086</h3><div class="cal-demo" id="imuDemo"><div class="demo-stage" aria-hidden="true"><div class="demo-surface"></div><div class="demo-object"><div class="cube-front">−Y</div><div class="cube-side">+X</div><div class="cube-top">+Z</div><div class="cube-back">+Y</div><div class="cube-left">−X</div><div class="cube-bottom">−Z</div></div><span class="demo-direction">Sensor body axes</span></div><p class="demo-caption" id="imuCaption" aria-live="off"></p><div class="demo-controls"><button id="imuPrev" aria-label="Previous imu demonstration step">←</button><button id="imuPlay">Pause demo</button><button id="imuNext" aria-label="Next imu demonstration step">→</button></div></div><p>BNO086: select Start IMU calibration, hold the board still for a few seconds, then hold 4–6 different orientations for a few seconds each. Finish on a firm support. Save when acceleration and gyro accuracy are both High. This calibrates the chip's six-axis fusion. Set zero only changes the display reference.</p><div class="calcontrols"><button id="imuStart">Start IMU calibration</button><button id="imuSave">Save IMU calibration</button></div><div id="imuStatus" role="status"></div></div><div id="legacyGuide"><h3>Six-face · legacy sensor</h3><div class="cal-demo" id="facesDemo"><div class="demo-stage" aria-hidden="true"><div class="demo-surface"></div><div class="demo-object"><div class="cube-front">−Y</div><div class="cube-side">+X</div><div class="cube-top">+Z</div><div class="cube-back">+Y</div><div class="cube-left">−X</div><div class="cube-bottom">−Z</div></div><span class="demo-direction">Place the named axis upward</span></div><p class="demo-caption" id="facesCaption" aria-live="off"></p><div class="demo-controls"><button id="facesPrev" aria-label="Previous faces demonstration step">←</button><button id="facesPlay">Pause demo</button><button id="facesNext" aria-label="Next faces demonstration step">→</button></div></div><p id="legacyCalHelp">Place each sensor axis (+X, −X, +Y, −Y, +Z, −Z) upward on a firm, square support. Start calibration, hold each face still until “Ready”, then select it. Capture all six and save. Calibration is retained after power-off. Set zero only changes the display reference.</p></div>
+<div class="calcontrols"><button id="calstart">Start calibration</button><button id="cancel" hidden>Cancel</button><button id="save" hidden>Save</button></div><div id="faces" hidden></div><div id="calibration"></div><div id="notice" role="status"></div></details><details id="zeroGuide"><summary>Relative zero · display reference</summary><div class="cal-demo" id="zeroDemo"><div class="demo-stage" aria-hidden="true"><div class="demo-surface"></div><div class="demo-object"><div class="cube-front">−Y</div><div class="cube-side">+X</div><div class="cube-top">+Z</div><div class="cube-back">+Y</div><div class="cube-left">−X</div><div class="cube-bottom">−Z</div></div><span class="demo-direction">Same starting position</span></div><p class="demo-caption" id="zeroCaption" aria-live="off"></p><div class="demo-controls"><button id="zeroPrev" aria-label="Previous zero demonstration step">←</button><button id="zeroPlay">Pause demo</button><button id="zeroNext" aria-label="Next zero demonstration step">→</button></div></div><p>Set zero makes the current pose the relative reference. It does not calibrate the sensor or save an IMU profile.</p><button id="zeroMeasure">Set zero</button></details></section><nav class="menu" role="tablist" aria-label="Main menu"><button id="measureTab" role="tab" aria-selected="true" aria-controls="measurePage">Measure</button><button id="mapTab" role="tab" aria-selected="false" aria-controls="mapPage">Map</button><button id="calibrateTab" role="tab" aria-selected="false" aria-controls="calibratePage">Calibrate</button><button id="historyTab" role="tab" aria-selected="false" aria-controls="historyPage">History</button></nav>
+<script src="protocol.js"></script><script src="tracking.js"></script><script src="reversal.js"></script><script src="vector.js"></script><script src="map.js"></script><script src="sessions.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),fmt=v=>Number.isFinite(v)?(Math.round(v*10)/10||0).toFixed(1):'—';
 const signed=v=>Number.isFinite(v)?((Math.round(v*10)/10>0?'+':'')+fmt(v)):'—';
+let axesSwapped=false;
+let setupStarted=false,calibrationAccepted=false,setupComplete=false,view='measure',calibrationPage='menu',mapLocatePending=false;
 let latest=null,tare=null,online=false,mode='LIVE BLE',nativeState='idle',nativeMessage='',calibrationKey=null;
 // BEGIN LIVE VECTOR FILTER
 // Acceleration-only random-walk Kalman smoother; not a gyro attitude EKF.
@@ -69,15 +91,17 @@ class LiveVectorFilter {
 // END LIVE VECTOR FILTER
 const liveFilter=new LiveVectorFilter();
 const reversal=new ReversalCalibration.ReversalZero();let lastSensorUptime=null;
+try{const saved=JSON.parse(window.LiveTiltAndroid?.loadZero?.()||'null');if(saved){if(Number.isFinite(saved.offset)&&saved.result){reversal.offset=saved.offset;reversal.result=saved.result;reversal.applied=true;}if(Array.isArray(saved.tare)&&saved.tare.length===3&&saved.tare.every(Number.isFinite))tare=saved.tare;}}catch(_){}
+function persistZero(){if(window.LiveTiltAndroid?.saveZero?.(JSON.stringify(reversal.applied||tare?{offset:reversal.offset,result:reversal.result,tare}:null))===false)reversalNotice='Could not save zero on this phone. Please retry.';}
 const names=['+X','−X','+Y','−Y','+Z','−Z'];
 for(let i=0;i<6;i++){const b=document.createElement('button');b.id='face'+i;b.className='face';b.textContent=names[i];b.onclick=()=>send('F'+i);$('faces').appendChild(b);}
 function send(s){if(window.LiveTiltAndroid)window.LiveTiltAndroid.send(s);}
 $('imuStart').onclick=()=>send('IMUCAL');
 $('imuSave').onclick=()=>send('SAVEDCD');
 $('calstart').onclick=()=>send('CALSTART');$('cancel').onclick=()=>send('CALCANCEL');$('save').onclick=()=>send('SAVE');
-$('tare').onclick=()=>{if(!reversal.busy&&displayReading()){tare=reversal.correct(liveFilter.value).slice();resetCaptureReference();render();}};
-$('untare').onclick=()=>{tare=null;resetCaptureReference();render();};
-function current(){return online&&latest?.protocol===2&&latest.valid&&!latest.simulated&&latest.state!==0&&mode!=='SIMULATED'&&Date.now()/1000-latest.pc_time<1;}
+$('tare').onclick=()=>{if(!reversal.busy&&displayReading()){tare=reversal.correct(liveFilter.value).slice();resetCaptureReference();persistZero();render();}};
+$('untare').onclick=()=>{tare=null;resetCaptureReference();persistZero();render();};
+function current(){return online&&latest?.protocol===2&&latest.valid&&!latest.simulated&&(latest.has_fusion||latest.state!==0)&&mode!=='SIMULATED'&&Date.now()/1000-latest.pc_time<1;}
 function displayReading(vector=liveFilter.value){
  if(!current())return null;
  let a=reversal.correct(vector);
@@ -95,11 +119,14 @@ function displayReading(vector=liveFilter.value){
 }
 function render(){
  const d=latest,r=displayReading(),ok=!!r,cal=!!d?.calibrating;
- $('slope').textContent=ok?signed(r.pitch)+'°':'—°';
- const pitchGrade=ok?(Math.abs(Math.cos(r.pitch*Math.PI/180))<1e-5?null:100*Math.tan(r.pitch*Math.PI/180)):null;
- $('grade').textContent=ok?(pitchGrade===null?(r.pitch<0?'−∞%':'+∞%'):signed(pitchGrade)+'%'):'—%';
- $('roll').textContent=ok?signed(r.roll)+'°':'—°';$('pitch').textContent=ok?signed(r.pitch)+'°':'—°';
- $('readingMode').textContent=tare?'Pitch · relative to zero':reversal.applied?'Pitch · reversal-corrected':'Pitch · absolute';
+ const left=ok?(axesSwapped?r.roll:r.pitch):null,right=ok?(axesSwapped?r.pitch:r.roll):null;
+ const gradient=a=>a===null?'—%':Math.abs(Math.cos(a*Math.PI/180))<1e-5?(a<0?'−∞%':'+∞%'):signed(100*Math.tan(a*Math.PI/180))+'%';
+ $('gradientLeft').textContent=gradient(left);$('gradientRight').textContent=gradient(right);
+ for(const id of ['gradientLeft','gradientRight'])$(id).style.fontSize=$(id).textContent.length>9?'16px':$(id).textContent.length>7?'20px':'';
+ $('pitch').textContent=ok?signed(left)+'°':'—°';$('roll').textContent=ok?signed(right)+'°':'—°';
+ $('axisLeft').textContent=axesSwapped?'Cross slope · Y':'Running slope · X';$('axisRight').textContent=axesSwapped?'Running slope · X':'Cross slope · Y';
+ $('swapAxes').setAttribute('aria-pressed',String(axesSwapped));
+ $('readingMode').textContent=tare?'Relative zero':reversal.applied?'Reversal corrected':'Absolute';
  $('connection').textContent=ok?(d.has_fusion?'Live · 6-axis':'Live'):nativeState==='scanning'?'Scanning':nativeState==='connecting'?'Connecting':online?'Waiting':'Disconnected';$('connection').className=ok?'live':'';
  const busy=nativeState==='scanning'||nativeState==='connecting'||nativeState==='retrying';
  $('connect').textContent=online?'Disconnect':busy?'Cancel':'Connect';
@@ -108,7 +135,7 @@ function render(){
  $('hint').textContent=nativeMessage|| (online&&!ok?'Waiting for valid sensor data':cal?'Calibration in progress · uncalibrated preview':ok&&d.chip_fusion?(d.imu_calibrating?'IMU calibration in progress':d.attitude_accuracy<2?'Fusion accuracy low · calibrate IMU':!d.imu_saved?'IMU calibration not saved':''):ok&&!d.saved?'Sensor not calibrated':'');
  const fresh=online&&d?.protocol===2&&Date.now()/1000-d.pc_time<1&&mode!=='SIMULATED';
  const chip=!!d?.chip_fusion,accuracy=['Unreliable','Low','Medium','High'];
- $('imuControls').hidden=!chip;$('legacyCalHelp').hidden=chip;
+ $('imuControls').hidden=!chip;$('legacyCalHelp').hidden=chip;$('legacyGuide').hidden=chip;
  $('imuStart').disabled=!fresh||d?.imu_calibrating;
  $('imuSave').disabled=!fresh||!d?.imu_calibrating||!d?.stable||d?.accel_accuracy<3||d?.gyro_accuracy<3;
  $('imuStatus').textContent=chip?`Accel: ${accuracy[d.accel_accuracy]} · Gyro: ${accuracy[d.gyro_accuracy]} · Fusion: ${accuracy[d.attitude_accuracy]} · ${d.imu_saved?'Saved profile':'Not saved'}`:'';
@@ -120,11 +147,12 @@ function render(){
  $('calibration').textContent=cal?(d.stable?'Ready — select the upward face.':'Hold still…'):(chip?(d.imu_calibrating?'IMU calibration active':d.imu_saved?'IMU profile saved':'IMU profile not saved'):(d?.saved?'Calibrated':'Not calibrated'));
  if(d?.calibration_result&&d.calibration_result!==5||!cal&&d?.calibration_result===5)$('calibration').textContent+=' · '+(messages[d.calibration_result]||'');
  for(let i=0;i<6;i++){const b=$('face'+i);b.className='face'+(d?.faces&(1<<i)?' done':'');b.disabled=!fresh||!cal||!d.stable;}
- renderReversal();
+ renderReversal();updateDemos();
  $('processingStatus').textContent=ok?(d.chip_fusion?`BNO086 six-axis · median + 1.5 s average + adaptive low-pass · IMU profile ${d.imu_saved?'saved':'not saved'} · Fusion ${accuracy[d.attitude_accuracy]}`:'Live filtering active · sensor profile '+(d.saved?'saved':'not saved')):'Waiting for live data · calibration is retained';
  drawScene(ok?r.vector:null);
- if(!ok){capture.reset();if(gpsEnabled)captureMessage='Waiting for live sensor readings';}
+ if(!ok){$('forceRecord').disabled=true;$('stabilityStatus').style.color='#fa8c88';$('stabilityStatus').textContent='Not recording · Waiting for valid sensor data';capture.reset();if(gpsEnabled)captureMessage='Waiting for live sensor readings';}
  updateGpsStatus();
+ renderSetup();
 }
 function canvas(id){const c=$(id),w=c.clientWidth,h=c.clientHeight,d=window.devicePixelRatio||1;if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}let x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);return [x,w,h];}
 function drawScene(a){const [c,w,h]=canvas('scene');c.fillStyle='#adc6d8';c.font='13px system-ui';if(!a){c.textAlign='center';c.fillText('Waiting for sensor',w/2,h/2);c.textAlign='left';return;}
@@ -136,33 +164,38 @@ function drawScene(a){const [c,w,h]=canvas('scene');c.fillStyle='#adc6d8';c.font
 }
 // Android sends only complete validated frames; no computer or WebSocket is involved.
 window.onNativeState=d=>{
- nativeState=d.state;nativeMessage=d.message||'';online=nativeState==='ready';
- if(!online){latest=null;liveFilter.reset();capture.reset();clearReversal('Disconnected: redo reversal zero after reconnecting');lastSensorUptime=null;}
+ nativeState=d.state;nativeMessage=d.message||'';online=nativeState==='ready';setupComplete=online;
+ if(!online){calibrationAccepted=false;setupComplete=false;latest=null;liveFilter.reset();capture.reset();lastSensorUptime=null;}
  render();
 };
 window.onNativeFrame=base64=>{
  if(!online)return;
  let d;try{d=LiveTiltProtocol.fromBase64(base64);}catch(_){return;}
  latest=d;
- if(lastSensorUptime!==null&&d.uptime_ms<lastSensorUptime){tare=null;clearReversal('Sensor restarted: redo reversal zero');}
+ if(lastSensorUptime!==null&&d.uptime_ms<lastSensorUptime){calibrationAccepted=false;}
  lastSensorUptime=d.uptime_ms;
- if(d.valid&&d.state!==0){
+ if(d.valid&&(d.has_fusion||d.state!==0)){
   const key=JSON.stringify([d.calibrating,d.saved,d.bias,d.scale,d.has_fusion,d.chip_fusion,d.imu_calibrating,d.imu_saved]);
-  if(calibrationKey!==null&&calibrationKey!==key){tare=null;clearReversal('Sensor calibration changed: redo reversal zero');$('notice').textContent='';}
+  if(calibrationKey!==null&&calibrationKey!==key){calibrationAccepted=false;$('notice').textContent='';}
   calibrationKey=key;
   liveFilter.update(d.has_fusion?d.fusion_accel:d.corrected,d.uptime_ms/1000,key,d.has_fusion?d.gyro:null,d.chip_fusion);
  }else {liveFilter.reset();capture.reset();}
- const reversalValid=current()&&!d.calibrating&&!d.imu_calibrating&&(!d.chip_fusion||(d.attitude_accuracy>=2&&d.gyro_accuracy>=2));
- reversal.update(d.has_fusion?d.fusion_accel:d.corrected,d.gyro,d.uptime_ms,reversalValid);
+
  // Test raw fused/corrected angles before display smoothing can hide movement.
  const raw=displayReading(d.has_fusion?d.fusion_accel:d.corrected);
- if(gpsEnabled&&raw&&!reversal.busy&&!d.calibrating&&!d.imu_calibrating){
+
+ if(setupComplete&&activeSession&&current()&&raw&&!reversal.busy&&!d.calibrating&&!d.imu_calibrating){
   const stable=capture.update(raw,performance.now(),referenceId);
-  captureMessage=stable?'Stable · waiting for usable GPS':'Hold steady · ±0.2° for 5 s';
-  if(stable&&GradientTracking.freshFix(gpsFix,performance.now()))savePoint(stable);
- }else {capture.reset();captureMessage=gpsEnabled?(reversal.busy?'GPS capture paused during reversal zero':'Waiting for live, non-calibration readings'):'';}
+  const spread=capture.spread();
+  $('stabilityStatus').style.color=stable?'#85e4b8':'#fa8c88';
+  $('stabilityStatus').textContent=(stable?'Stable · Auto recording':'Unstable / waiting for 3 s · Recording not recommended')+` · 3 s variation X ±${spread.pitch.toFixed(2)}° / Y ±${spread.roll.toFixed(2)}° (not absolute error)`;
+  $('forceRecord').disabled=!!stable;
+  captureMessage=stable?'Stable · auto recording':'Hold steady · ±0.2° for 3 s';
+  if(stable){recordSessionSample(stable);if(gpsEnabled&&GradientTracking.freshFix(gpsFix,performance.now()))savePoint(stable);}
+ }else {capture.reset();$('forceRecord').disabled=true;$('stabilityStatus').style.color='#fa8c88';$('stabilityStatus').textContent='Not recording · Start a session and wait for valid readings';captureMessage=gpsEnabled?(reversal.busy?'GPS capture paused during reversal zero':'Waiting for live, non-calibration readings'):'';}
 };
 window.onNativeNotice=text=>{$('notice').textContent=text;};
+$('swapAxes').onclick=()=>{axesSwapped=!axesSwapped;render();};
 $('connect').onclick=()=>{if(window.LiveTiltAndroid)window.LiveTiltAndroid.connect();};
 const capture=new GradientTracking.StableCapture();
 let gpsEnabled=false,gpsFix=null,gpsMessage='GPS recording off',captureMessage='',storageError='';
@@ -171,6 +204,13 @@ try {
  const stored=window.LiveTiltAndroid?.loadRecords?.();
  if(stored){const parsed=JSON.parse(stored);if(!Array.isArray(parsed)||!parsed.every(p=>p&&['latitude','longitude','accuracy','pitch','roll','timestamp'].every(k=>Number.isFinite(p[k]))))throw Error('Invalid records');records=parsed;}
 }catch(_){storageError='Saved points could not be loaded. Restart the app before recording.';}
+let onlineMap=!!window.LiveTiltAndroid?.onlineMap?.();
+function mapMode(){ $('onlineMap').textContent=onlineMap?'Online maps enabled · Switch to offline':'Offline mode · Enable online maps'; }
+mapMode();$('onlineMap').onclick=()=>{onlineMap=!onlineMap;window.LiveTiltAndroid?.setOnlineMap?.(onlineMap);mapMode();slopeMap.tiles.clear();slopeMap.draw();};
+$('downloadMap').onclick=()=>{const p=slopeMap.geographicCenter();if(!p||$('mapCanvas').hidden){$('mapDownloadStatus').textContent='Wait for your location or select a saved point first';return;}$('downloadMap').disabled=true;$('mapDownloadStatus').textContent='Preparing download…';window.LiveTiltAndroid?.downloadMap?.(p.latitude,p.longitude);};
+$('cancelMapDownload').onclick=()=>window.LiveTiltAndroid?.cancelMapDownload?.();
+window.onMapDownloadStatus=text=>{$('mapDownloadStatus').textContent=text;if(!text.startsWith('Downloading map ')){ $('downloadMap').disabled=false;slopeMap.tiles.clear();slopeMap.draw();}};
+window.onOfflineMapStatus=text=>{$('mapLocationStatus').textContent=text;slopeMap.tiles.clear();slopeMap.draw();};
 const slopeMap=new GradientMap($('mapCanvas'),$('mapInfo'),showPoint);
 function resetCaptureReference(){capture.reset();referenceId=Date.now().toString()+Math.random().toString(36).slice(2);}
 let reversalNotice='';
@@ -179,24 +219,20 @@ function clearReversal(message=''){
  reversal.clear();reversalNotice=affected?message:'';resetCaptureReference();
 }
 function renderReversal(){
- const ready=current()&&!latest.calibrating&&!latest.imu_calibrating;
- $('reverseStart').hidden=reversal.busy;$('reverseStart').disabled=!ready;
- $('reverseSecond').hidden=reversal.stage!=='turn';$('reverseSecond').disabled=!ready;
- $('reverseApply').hidden=reversal.stage!=='review';$('reverseApply').disabled=!ready;
+ $('reverseStart').hidden=reversal.busy;$('reverseStart').disabled=false;
+ $('reverseSecond').hidden=reversal.stage!=='turn';$('reverseSecond').disabled=false;
  $('reverseCancel').hidden=!reversal.busy;
  $('reverseClear').hidden=!reversal.applied;$('reverseClear').disabled=reversal.busy;
  let text=reversalNotice;
- if(reversal.stage==='first'||reversal.stage==='second')text=`${reversal.stage==='first'?'First':'Opposite'} direction: ${(reversal.progress*5).toFixed(1)} / 5.0 s stable`+(reversal.reason?' · '+reversal.reason:' · hold still');
- else if(reversal.stage==='turn')text=`First ${signed(reversal.first.pitch)}° saved. Turn 180° on the same slope, same face down; then capture opposite.`;
- else if(reversal.stage==='review'){const c=reversal.candidate;text=`First ${signed(reversal.first.pitch)}° · Opposite ${signed(reversal.second.pitch)}° · Pitch zero offset ${signed(c.offset)}° · Slope ${fmt(c.slope)}°. Apply only after confirming opposite directions.`;}
- else if(reversal.applied)text=`Pitch zero offset ${signed(reversal.offset)}° applied · pair slope ${fmt(reversal.result.slope)}° · IMU calibration unchanged`;
+ if(reversal.stage==='turn')text=`First ${signed(reversal.first.pitch)}° saved. Turn 180° on the same slope, same face down; click again to record and apply.`;
+ else if(reversal.applied)text=`First ${signed(reversal.result.first.pitch)}° · Opposite ${signed(reversal.result.second.pitch)}° · Average zero offset ${signed(reversal.offset)}° applied · pair slope ${fmt(reversal.result.slope)}°`;
  $('reverseStatus').textContent=text||'No reversal zero applied';
 }
-$('reverseStart').onclick=()=>{if(current()&&!latest.calibrating&&!latest.imu_calibrating){reversal.start();reversalNotice='';resetCaptureReference();render();}};
-$('reverseSecond').onclick=()=>{if(current()&&reversal.opposite()){resetCaptureReference();render();}};
-$('reverseApply').onclick=()=>{if(current()&&reversal.apply()){tare=null;reversalNotice='';resetCaptureReference();render();}};
-$('reverseCancel').onclick=()=>{reversal.cancel();reversalNotice='Reversal sampling cancelled';resetCaptureReference();render();};
-$('reverseClear').onclick=()=>{tare=null;clearReversal('Reversal zero cleared');render();};
+function reversalVector(){return latest?(latest.has_fusion?latest.fusion_accel:latest.corrected):null;}
+$('reverseStart').onclick=()=>{if(reversal.start(reversalVector())){demoStates.reversal.step=1;paintDemo('reversal');reversalNotice='';resetCaptureReference();}else reversalNotice='No angle data received yet.';render();};
+$('reverseSecond').onclick=()=>{if(reversal.opposite(reversalVector())){tare=null;reversalNotice='';persistZero();liveFilter.reset();liveFilter.update(reversalVector(),latest.uptime_ms/1000,'reversal',latest.gyro,latest.chip_fusion);resetCaptureReference();}else reversalNotice='No angle data received yet.';render();};
+$('reverseCancel').onclick=()=>{reversal.cancel();reversalNotice='Reversal capture cancelled';resetCaptureReference();render();};
+$('reverseClear').onclick=()=>{tare=null;clearReversal('Reversal zero cleared');persistZero();render();};
 function showPoint(p){
  $('pointDetail').hidden=false;
  const grade=Math.abs(Math.cos(p.pitch*Math.PI/180))<1e-5?'undefined (vertical)':signed(100*Math.tan(p.pitch*Math.PI/180))+'%';
@@ -214,10 +250,10 @@ function refreshPoints(){
 }
 function savePoint(stable){
  const point={...stable,latitude:gpsFix.latitude,longitude:gpsFix.longitude,accuracy:gpsFix.accuracy,
-  timestamp:Date.now(),locationTimestamp:gpsFix.timestamp,referenceId,relative:!!tare,calibrated:latest.chip_fusion?!!latest.imu_saved:!!latest.saved,
+  timestamp:Date.now(),sessionId:activeSession?.id,locationTimestamp:gpsFix.timestamp,referenceId,relative:!!tare,calibrated:latest.chip_fusion?!!latest.imu_saved:!!latest.saved,
   zeroMethod:reversal.applied?'reversal':'sensor',pitchZeroOffset:reversal.applied?reversal.offset:0,
   reversalMeasurements:reversal.applied?reversal.result:null};
- if(!GradientTracking.differentPoint(records[records.length-1],point)){captureMessage='Already saved here · move to a new spot or change the angle';return;}
+ if(!stable.forced&&!GradientTracking.differentPoint(records[records.length-1],point)){captureMessage='Already saved here · move to a new spot or change the angle';return;}
  if(storageError)return;
  if(records.length>=10000){storageError='10,000-point limit reached. Recording paused; existing points are retained.';return;}
  const next=records.concat(point);
@@ -230,32 +266,168 @@ function updateGpsStatus(){
  const fresh=GradientTracking.freshFix(gpsFix,performance.now());
  $('gpsStatus').textContent=gpsEnabled?(fresh?`GPS ready · ±${gpsFix.accuracy.toFixed(0)} m`:gpsFix?`Waiting for GPS ≤20 m and ≤10 s old · last ±${gpsFix.accuracy.toFixed(0)} m`:gpsMessage):'GPS recording off';
  $('captureStatus').textContent=storageError||(gpsEnabled?captureMessage:'');
- $('gpsToggle').textContent=gpsEnabled?'Pause GPS recording':'Enable GPS recording';$('gpsRetry').hidden=!gpsEnabled;
- $('mapHere').disabled=!fresh;
+ $('gpsToggle').textContent=gpsEnabled?'Disable GPS':'Enable GPS';$('gpsRetry').hidden=!gpsEnabled;
+ $('mapHere').disabled=false;
 }
 window.onNativeLocation=d=>{
  const now=performance.now(),fix={...d,receivedAt:now};
- if(!gpsEnabled)return;
+ if(!gpsEnabled&&view!=='map')return;
  // An older fix from a slower provider must not displace a newer one.
  if(gpsFix&&now-gpsFix.receivedAt+gpsFix.ageMs<fix.ageMs)return;
- gpsFix=fix;updateGpsStatus();
+ gpsFix=fix;slopeMap.currentLocation=fix;if(mapLocatePending&&Number.isFinite(fix.latitude)&&Number.isFinite(fix.longitude)&&fix.ageMs<60000){mapLocatePending=false;$('mapCanvas').hidden=false;slopeMap.zoom=17;slopeMap.focus(fix);$('mapLocationStatus').textContent='Your location · ±'+Math.round(fix.accuracy)+' m';}updateGpsStatus();
 };
-window.onNativeLocationState=text=>{gpsMessage=text;gpsFix=null;capture.reset();updateGpsStatus();};
+window.onNativeLocationState=text=>{if(view==='map')$('mapLocationStatus').textContent=text;gpsMessage=text;gpsFix=null;capture.reset();updateGpsStatus();};
 $('gpsToggle').onclick=()=>{
  gpsEnabled=!gpsEnabled;gpsFix=null;capture.reset();captureMessage='';gpsMessage='Waiting for GPS permission / fix…';
  window.LiveTiltAndroid?.location?.(gpsEnabled);updateGpsStatus();
 };
 $('gpsRetry').onclick=()=>{gpsFix=null;capture.reset();if(!storageError.includes('loaded'))storageError='';window.LiveTiltAndroid?.location?.(true);updateGpsStatus();};
 function showPage(map){
+ if(view==='map'&&!map&&!gpsEnabled){mapLocatePending=false;window.LiveTiltAndroid?.location?.(false);}
+ view=map?'map':'measure';$('startPage').hidden=true;$('setupPage').hidden=true;
+ $('calibratePage').hidden=true;$('calibrateTab').setAttribute('aria-selected','false');
+ $('historyPage').hidden=true;$('historyTab').setAttribute('aria-selected','false');
  $('measurePage').hidden=map;$('mapPage').hidden=!map;$('measureTab').setAttribute('aria-selected',String(!map));$('mapTab').setAttribute('aria-selected',String(map));
  window.scrollTo(0,0);slopeMap.visible=map;
- if(map){slopeMap.failed=false;for(const [key,img] of slopeMap.tiles)if(img.complete&&!img.naturalWidth)slopeMap.tiles.delete(key);slopeMap.draw();}
+ if(map){$('mapCanvas').hidden=false;slopeMap.setPoints(records);locateMap();slopeMap.failed=false;for(const [key,img] of slopeMap.tiles)if(img.complete&&!img.naturalWidth)slopeMap.tiles.delete(key);slopeMap.draw();}
+ renderSetup();
 }
+$('calibrateTab').onclick=()=>{showPage(false);$('measurePage').hidden=true;$('measureTab').setAttribute('aria-selected','false');$('calibratePage').hidden=false;view='calibrate';calibrationPage='menu';$('calibrateTab').setAttribute('aria-selected','true');render();};
+$('zeroMeasure').onclick=()=>{$('tare').onclick();$('zeroMeasure').textContent='Zero set · set again';};
 $('measureTab').onclick=()=>showPage(false);$('mapTab').onclick=()=>showPage(true);
 $('zoomIn').onclick=()=>slopeMap.changeZoom(1);$('zoomOut').onclick=()=>slopeMap.changeZoom(-1);
 $('mapLatest').onclick=()=>{const p=records[records.length-1];if(p){slopeMap.focus(p);showPoint(p);}};
-$('mapHere').onclick=()=>{if(GradientTracking.freshFix(gpsFix,performance.now()))slopeMap.focus(gpsFix);};
+function locateMap(){mapLocatePending=true;$('mapLocationStatus').textContent='Finding your location… Allow phone location access.';window.LiveTiltAndroid?.location?.(true);if(gpsFix&&Number.isFinite(gpsFix.latitude)&&Number.isFinite(gpsFix.longitude)&&performance.now()-gpsFix.receivedAt+gpsFix.ageMs<60000){mapLocatePending=false;$('mapCanvas').hidden=false;slopeMap.currentLocation=gpsFix;slopeMap.zoom=17;slopeMap.focus(gpsFix);$('mapLocationStatus').textContent='Your location · ±'+Math.round(gpsFix.accuracy)+' m';}}
+$('mapHere').onclick=locateMap;
+let sessions=[],activeSession=null,lastSampleAt=-Infinity,sessionError='';const selectedSessions=new Set();
+try{
+ const raw=window.LiveTiltAndroid?.loadSessions?.();
+ if(raw){const parsed=JSON.parse(raw);if(!Array.isArray(parsed)||!parsed.every(s=>s&&typeof s.id==='string'&&Number.isFinite(s.startedAt)&&Array.isArray(s.samples)))throw Error('Invalid history');sessions=parsed;}
+ else if(records.length){sessions=[{id:'legacy',startedAt:Math.min(...records.map(p=>p.timestamp)),stoppedAt:Math.max(...records.map(p=>p.timestamp)),samples:records.slice()}];if(!persistSessions(sessions))throw Error('Migration failed');}
+ // A process exit closes an interrupted session at its last persisted sample.
+ for(const s of sessions)if(s.stoppedAt===null)s.stoppedAt=s.samples.at(-1)?.timestamp||s.startedAt;
+}catch(_){sessionError='History could not be loaded. Restart the app before recording.';}
+function persistSessions(next){try{return !!window.LiveTiltAndroid?.saveSessions?.(JSON.stringify(next));}catch(_){return false;}}
+function renderHistory(){
+ $('historyList').textContent='';$('historyEmpty').textContent=sessions.length?'Tap View data to inspect readings. Select checkboxes to export or delete.':'No saved sessions yet.';
+ for(const s of sessions.slice().reverse()){
+  const row=document.createElement('label');row.className='session-row';
+  const check=document.createElement('input');check.type='checkbox';check.checked=selectedSessions.has(s.id);check.disabled=s===activeSession;
+  check.onchange=()=>{if(check.checked)selectedSessions.add(s.id);else selectedSessions.delete(s.id);updateHistoryButtons();};row.appendChild(check);
+  const text=document.createElement('span');text.textContent=' '+new Date(s.startedAt).toLocaleString()+' · '+s.samples.length+' samples · '+(s===activeSession?'Recording':s.id==='legacy'?'Imported history':'Stopped');row.appendChild(text);$('historyList').appendChild(row);
+  const inspect=document.createElement('button');inspect.textContent='View data';inspect.onclick=()=>showSession(s);$('historyList').appendChild(inspect);
+ }
+ updateHistoryButtons();
+}
+function updateHistoryButtons(){
+ for(const id of ['exportSelectedCsv','exportSelectedHtml','deleteSelected'])$(id).disabled=!selectedSessions.size;
+ $('exportAllCsv').disabled=$('exportAllHtml').disabled=!sessions.length;
+}
+function updateSessionStatus(){
+ $('sessionStart').disabled=!!activeSession||!!sessionError;$('sessionStop').disabled=!activeSession;
+ $('sessionStatus').textContent=sessionError||(activeSession?'Recording · '+activeSession.samples.length+' samples · '+(current()?'stable 3 s · ±0.2°':'waiting for sensor'):'Stopped · press Start for a new session');
+}
+$('sessionStart').onclick=()=>{
+ if(activeSession||sessionError||!setupComplete)return;
+ const s={id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),startedAt:Date.now(),stoppedAt:null,samples:[]};
+ if(!persistSessions(sessions.concat(s))){$('sessionStatus').textContent='Could not start: storage unavailable.';return;}
+ sessions.push(s);activeSession=s;lastSampleAt=-Infinity;resetCaptureReference();
+ if(!gpsEnabled)$('gpsToggle').onclick();renderHistory();updateSessionStatus();
+};
+$('sessionStop').onclick=()=>{
+ if(!activeSession)return;
+ const stop=Date.now(),next=sessions.map(s=>s===activeSession?{...s,stoppedAt:stop}:s);
+ if(!persistSessions(next)){$('sessionStatus').textContent='Could not save Stop. Please retry.';return;}
+ sessions=next;activeSession=null;capture.reset();$('forceRecord').disabled=true;$('stabilityStatus').textContent='Recording stopped';if(gpsEnabled)$('gpsToggle').onclick();renderHistory();updateSessionStatus();
+};
+function recordSessionSample(r,forced=false){
+ if(!activeSession||!r||reversal.busy||latest.calibrating||latest.imu_calibrating||(!forced&&performance.now()-lastSampleAt<3000))return;
+ if(sessions.reduce((n,s)=>n+s.samples.length,0)>=50000){$('sessionStatus').textContent='50,000-sample limit. Stop and export or delete history.';return;}
+ const fix=GradientTracking.freshFix(gpsFix,performance.now())?gpsFix:null;
+ const p={forced,variation:capture.spread(),timestamp:Date.now(),pitch:r.pitch,roll:r.roll,latitude:fix?.latitude??null,longitude:fix?.longitude??null,accuracy:fix?.accuracy??null,locationTimestamp:fix?.timestamp??null,relative:!!tare,calibrated:latest.chip_fusion?!!latest.imu_saved:!!latest.saved,zeroMethod:reversal.applied?'reversal':'sensor',pitchZeroOffset:reversal.applied?reversal.offset:0,referenceId};
+ const updated={...activeSession,samples:activeSession.samples.concat(p)},next=sessions.map(s=>s===activeSession?updated:s);
+ if(!persistSessions(next)){$('sessionStatus').textContent='Could not save sample. Recording will retry.';return;}
+ sessions=next;activeSession=updated;lastSampleAt=performance.now();updateSessionStatus();
+}
+$('forceRecord').onclick=()=>{if(!current()||!activeSession||reversal.busy||latest.calibrating||latest.imu_calibrating)return;const r=displayReading(latest.has_fusion?latest.fusion_accel:latest.corrected);if(!r)return;recordSessionSample(r,true);if(gpsEnabled&&GradientTracking.freshFix(gpsFix,performance.now()))savePoint({...r,forced:true,variation:capture.spread()});};
+function exportHistory(format,all){
+ const chosen=all?sessions:sessions.filter(s=>selectedSessions.has(s.id));if(!chosen.length)return;
+ const content=SessionExport[format](chosen);
+ window.LiveTiltAndroid?.exportFile?.('TEAL-Tilt-'+Date.now()+'.'+format,format==='csv'?'text/csv':'text/html',content);
+}
+for(const [id,format,all] of [['exportAllCsv','csv',true],['exportAllHtml','html',true],['exportSelectedCsv','csv',false],['exportSelectedHtml','html',false]])$(id).onclick=()=>exportHistory(format,all);
+window.onNativeExportStatus=text=>{$('historyStatus').textContent=text;};
+$('deleteSelected').onclick=()=>{
+ if(!selectedSessions.size||!window.confirm('Delete '+selectedSessions.size+' selected sessions and their map points? This cannot be undone.'))return;
+ const next=sessions.filter(s=>!selectedSessions.has(s.id)||s===activeSession);
+ const remaining=records.filter(p=>!selectedSessions.has(p.sessionId||'legacy'));
+ if(!window.LiveTiltAndroid?.deleteSessions?.(JSON.stringify(next),JSON.stringify(remaining))){$('historyStatus').textContent='Could not delete sessions. Retry.';return;}
+ sessions=next;records=remaining;$('sessionDetail').hidden=true;$('historyStatus').textContent='Selected sessions deleted.';
+ selectedSessions.clear();$('pointDetail').hidden=true;refreshPoints();renderHistory();
+};
+$('historyTab').onclick=()=>{showPage(false);$('measurePage').hidden=true;$('historyPage').hidden=false;view='history';$('startPage').hidden=true;$('setupPage').hidden=true;$('calibratePage').hidden=true;$('measureTab').setAttribute('aria-selected','false');$('historyTab').setAttribute('aria-selected','true');renderHistory();};
+renderHistory();updateSessionStatus();
 refreshPoints();
+const demoSteps={
+ reversal:['1 / 2 · Face the wheelchair uphill on the slope. Keep the sensor mounted in the same position, hold still, then tap Record first angle.','2 / 2 · Turn 180° to face downhill on the same slope. Keep both wheels on the ground and the sensor mounting unchanged. Hold still, then tap Record opposite & apply.'],
+ imu:['1 / 6 · Tap Start IMU calibration. Rest the sensor still for a few seconds.','2 / 6 · Slowly tilt to another orientation; hold still for a few seconds.','3 / 6 · Tilt to another orientation and hold still.','4 / 6 · Turn onto another side and hold still.','5 / 6 · Repeat across 4–6 different orientations. Watch Accel and Gyro quality.','6 / 6 · Finish on a firm support. Save only when Accel and Gyro are High and the Save button enables.'],
+ faces:['1 / 6 · Point +X upward. When Ready, tap +X.','2 / 6 · Point −X upward. When Ready, tap −X.','3 / 6 · Point +Y upward. When Ready, tap +Y.','4 / 6 · Point −Y upward. When Ready, tap −Y.','5 / 6 · Point +Z upward. When Ready, tap +Z.','6 / 6 · Point −Z upward. When Ready, tap −Z. After all six captures, tap Save.'],
+ zero:['1 / 2 · Hold the sensor in your reference pose, then tap Set zero below.','2 / 2 · Move from that pose to see relative angles. Reset zero restores absolute readings.']
+};
+const demoStates={};
+for(const [kind,steps] of Object.entries(demoSteps)){
+ const state=demoStates[kind]={step:0,playing:false,last:performance.now()};
+ const step=delta=>{state.step=(state.step+delta+steps.length)%steps.length;state.playing=false;state.last=performance.now();paintDemo(kind);};
+ $(kind+'Prev').onclick=()=>step(-1);$(kind+'Next').onclick=()=>step(1);
+ $(kind+'Play').onclick=()=>{state.playing=!state.playing;state.last=performance.now();paintDemo(kind);};
+ paintDemo(kind);
+}
+function paintDemo(kind){const state=demoStates[kind];$(kind+'Demo').className='cal-demo demo-'+kind+' pose-'+state.step;$(kind+'Caption').textContent=demoSteps[kind][state.step];$(kind+'Play').textContent=state.playing?'Pause demo':'Play demo';$(kind+'Play').setAttribute('aria-pressed',String(state.playing));}
+function updateDemos(){
+ if(typeof demoStates==='undefined'||$('calibratePage').hidden)return;
+ const now=performance.now();
+ for(const [kind,state] of Object.entries(demoStates)){
+  const visible=kind==='reversal'?!$('reversalPanel').hidden&&$('reversalPanel').open:kind==='zero'?!$('zeroGuide').hidden&&$('zeroGuide').open:!$('calibrationPanel').hidden&&$('calibrationPanel').open&&(kind==='imu'?!$('imuControls').hidden:!$('legacyGuide').hidden);
+  if(!visible){state.last=now;continue;}
+  if(state.playing&&now-state.last>=6500){state.step=(state.step+1)%demoSteps[kind].length;state.last=now;paintDemo(kind);}
+ }
+}
+function renderSetup(){
+ setupComplete=online;
+ $('sessionStart').disabled=!!activeSession||!!sessionError||!online;
+ $('connect').hidden=false;
+ $('setupPage').hidden=true;
+ $('startPage').hidden=view!=='measure'||online||setupStarted;
+ if(view==='measure'){
+  $('measurePage').hidden=!online;
+  if(!online&&setupStarted){$('setupPage').hidden=false;$('setupTitle').textContent='Connect your device';$('setupHelp').textContent=nativeMessage||'Turn on MAO_SLOPE and Bluetooth, then tap Connect Device.';$('setupProgress').textContent='';$('setupConnect').hidden=false;$('setupConnect').textContent=['scanning','connecting','retrying'].includes(nativeState)?'Cancel connection':'Connect Device';}
+ }
+ $('calibratePage').hidden=view!=='calibrate';
+ $('calibrationTitle').textContent=({menu:'Calibration',sensor:'Sensor calibration',reversal:'180° zero',zero:'Set zero'})[calibrationPage];
+ $('calibrationMenu').hidden=calibrationPage!=='menu';$('calibrationBack').hidden=calibrationPage==='menu';
+ for(const [id,name] of [['calibrationPanel','sensor'],['reversalPanel','reversal'],['zeroGuide','zero']]){$(id).hidden=calibrationPage!==name;$(id).open=true;}
+ $('zeroMeasure').disabled=!current();
+ $('savedCalibration').hidden=calibrationPage!=='menu';
+ $('savedCalibration').textContent=(latest?.chip_fusion?latest.imu_saved:latest?.saved)?'Sensor profile saved on device · reused automatically.':reversal.applied?'180° zero saved · reused automatically.':tare?'Reference zero saved · reused automatically.':'Calibration is optional. Connect and measure anytime.';
+}
+function openCalibrationPage(name){calibrationPage=name;if(name==='reversal'){demoStates.reversal.step=reversal.busy?1:0;paintDemo('reversal');}render();}
+$('chooseSensor').onclick=()=>openCalibrationPage('sensor');
+$('chooseReversal').onclick=()=>openCalibrationPage('reversal');
+$('chooseZero').onclick=()=>openCalibrationPage('zero');
+$('calibrationBack').onclick=()=>openCalibrationPage('menu');
+$('startConnect').onclick=()=>{setupStarted=true;view='measure';render();};
+$('startHistory').onclick=()=>$('historyTab').onclick();
+$('setupConnect').onclick=()=>$('connect').onclick();
+function showSession(session){
+ $('sessionDetail').hidden=false;$('sessionDetailTitle').textContent=new Date(session.startedAt).toLocaleString()+' · '+session.samples.length+' readings';
+ const host=$('sessionSamples');host.textContent='';
+ const table=document.createElement('table');table.style.width='100%';
+ const heading=document.createElement('tr');for(const name of ['Time','Running slope','Cross slope','GPS']){const cell=document.createElement('th');cell.textContent=name;heading.appendChild(cell);}table.appendChild(heading);
+ for(const p of session.samples){const row=document.createElement('tr');for(const value of [new Date(p.timestamp).toLocaleTimeString(),signed(p.pitch)+'°',signed(p.roll)+'°',Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)?p.latitude.toFixed(5)+', '+p.longitude.toFixed(5):'No GPS']){const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);}table.appendChild(row);}host.appendChild(table);
+ const points=session.samples.filter(p=>Number.isFinite(p.latitude)&&Number.isFinite(p.longitude));
+ $('sessionMap').disabled=!points.length;$('sessionMap').onclick=()=>{showPage(true);mapLocatePending=false;$('mapCanvas').hidden=false;slopeMap.setPoints(points);slopeMap.focus(points.at(-1));showPoint(points.at(-1));};
+ $('sessionDetail').scrollIntoView?.({behavior:'smooth',block:'start'});
+}
 const DISPLAY_INTERVAL_MS=50;
 render();setInterval(render,DISPLAY_INTERVAL_MS);
 if(window.LiveTiltAndroid)window.LiveTiltAndroid.ready();

@@ -1,3 +1,72 @@
+# v1.9.0 validation · 2026-11-18
+
+Passed mobile integration, reversal arithmetic, map zoom, tracking and exports. Added `tests/app-flow.test.cjs`: headless Chrome verifies immediate readings/3D without calibration or zero, a three-button calibration menu with exclusive subpages, reversal/reference-zero persistence across reload, map GPS requests without recording, approximate-fix centering, no arbitrary map before first fix, and 360/390/432px navigation without overflow or page errors. Inspected `tests/calibration-menu-preview.png`.
+
+Android assembleDebug and lintDebug passed. BLE now grants 30 seconds for transient activity pauses, avoids resume scans against an existing GATT connection, tolerates 30 seconds of absent packets, and reports GATT error codes/logcat. No physical Android device attached (`adb devices` empty): radio reliability, Android permission UI, sensor profile save/reload and real map tiles/location remain unverified. Backgrounding longer than 30 seconds still pauses BLE; no continuous background service is claimed.
+
+APK: `dist/TEAL-Tilt-1.9.0-debug.apk`, versionCode 18. Sensor profiles stay on device; reversal and reference zero persist on phone.
+
+# v1.8.2 validation · 2026-11-18
+
+Passed mobile UI and reversal arithmetic regressions. New integration case clicks at +3° and +1° with invalid/stale, moving, unsaved and actively calibrating frames: immediate zero offset +2°, no state gating. Disconnect, sensor restart and calibration flag changes preserve the offset. Missing/non-numeric input still cannot supply an angle. Android assembleDebug and lintDebug passed. Physical sensor validation remains outstanding.
+
+APK: `dist/TEAL-Tilt-1.8.2-debug.apk`, versionCode 17.
+
+# v1.8.1 validation · 2026-11-18
+
+Calibration is optional. UI regression verifies skipping an unsaved calibration, explicit zero before readings, connection gating, and blocking continuation during active calibration. Mobile integration, assembleDebug and lintDebug passed. APK: `dist/TEAL-Tilt-1.8.1-debug.apk` (versionCode 16). Physical phone/sensor validation remains outstanding.
+
+# v1.8.0 validation · 2026-11-18
+
+Passed mobile UI integration, guided connection/calibration/zero gating, disconnect relocking, offline history/sample inspection, session deletion persistence, native confirmation wiring, map empty-state tile requests/first-point recentering, zoom, tracking, reversal, and session exports. Headless Chrome verified the actual setup flow, offline History access, hidden 3D before zero, visible 3D after zero, 360/390/432px layout without horizontal overflow, empty-map tile requests, and no page exceptions. Inspected `tests/guided-readings-preview.png`. Android assembleDebug and lintDebug passed.
+
+APK: `dist/TEAL-Tilt-1.8.0-debug.apk`, versionCode 15. Physical phone BLE/GPS, native confirmation taps, and field map tile connectivity have not been verified. Existing saved calibration can be reused with an explicit Continue; new calibration requires a saved sensor profile.
+
+# v1.7.1 validation
+
+Mobile UI/calibration controls regression, responsive four-tab browser checks, Android assembleDebug and lintDebug passed. Inspected both `tests/wheelchair-uphill.png` and `tests/wheelchair-downhill.png`: upright rider and wheelchair, wheels on slope, opposite facing directions, two captions. Reduced-motion/manual controls remain supported. Hardware calibration remains unverified on a physical phone.
+
+# v1.7.0 validation
+
+Passed mobile UI tests for dedicated calibration navigation, exclusive page visibility, previous/next, play/pause, visible autoplay and off-page pause. Existing calibration BLE controls, reversal math, GPS/session/export and map zoom regressions passed. Responsive browser checks covered all four tabs at 360/384/412/432px portrait and landscape, 48px buttons and text-size reflow. Browser additionally verified reduced-motion starts paused, IMU/legacy guide selection follows sensor mode, and IMU Next updates the caption. Inspected calibration screenshot. Android debug build and lint passed. Physical phone/sensor calibration is not verified by instructional animations.
+
+# v1.6.2 validation
+
+Passed: mobile UI regression including axis swap/restore and removed single reading; tracking, reversal, CSV/HTML exports; new map zoom test verifies bounds 2–26, 128× coordinate/tile scale and tile source cap 19. Responsive browser checks passed across 360/384/412/432px portrait and landscape; live synthetic frame screenshot inspected at `tests/dual-axis-preview.png`. Android debug build and lint passed. Real phone BLE/GPS checks remain unperformed.
+
+# v1.6.1 Galaxy A16 layout validation
+
+- Passed mobile UI, tracking, reversal and session export tests.
+- Chromium checks: 360×780, 384×820, 412×892, 432×900, and 780×360; Measure/Map/History; Start/Stop and history checkbox; no JS exceptions or horizontal overflow; visible buttons at least 48 CSS pixels tall. Increased controls/summary/history text to 20px and checked reflow.
+- Inspected screenshots `tests/a16-measureTab.png`, `tests/a16-historyTab.png`; map screenshot also retained.
+- `:app:assembleDebug :app:lintDebug` passed. No physical Galaxy A16 attached; real Samsung WebView/font-scaling/system-navigation verification is not claimed.
+
+# v1.6.0 validation · 2026-11-13
+
+Passed: mobile-ui integration (including Start/Stop, persisted samples, distinct sessions, selected/all CSV/HTML dispatch, deletion, valid fusion with diagnostic state zero), reversal tests, tracking tests, CSV/HTML escaping and GPS blank-field tests. Android assembleDebug and lintDebug passed. A Chromium 390 × 844 check passed Start/Stop and History checkbox interaction with no page exceptions or horizontal overflow; inspected `tests/history-preview.png`.
+
+Not tested on a physical phone: BLE/180° mechanical placement, phone GPS permission flow, and Android system file-picker export. Background recording is intentionally paused. Debug signing retained; no firmware changes in this update.
+
+# v1.5.2 两次点击对向校准验证
+
+- `node tests/reversal.test.cjs`：通过；立即记录、第二次自动平均应用、重复校准、取消及无效向量。
+- `node tests/mobile-ui.test.cjs`：通过；两次点击无需稳定窗口，Pitch/Grade/3D/GPS 修正及断线、重启、校准变更清除。
+- `node tests/tracking.test.cjs`：通过；GPS 稳定采样逻辑保持通过。
+- `./gradlew :app:assembleDebug :app:lintDebug`：通过；SDK 已安装到持久目录。
+- `apksigner verify --print-certs`：通过；APK 版本 1.5.2 / versionCode 8。
+- APK 中 `reversal.js` / `index.html` 与当前源码逐字节一致。
+- 已更新 `dist/LiveTilt-debug.apk`；未做真实手机验证。
+
+---
+
+## v1.5.1 button startup fix · 2026-11-04
+
+- Root cause: native WebView asset allowlist omitted `reversal.js`; the blocked dependency stopped UI initialization before button event binding.
+- Added the missing local script to the existing allowlist; retained remote request restrictions.
+- Passed: mobile-ui, reversal, tracking Node suites; regression also rejects the original allowlist with reversal.js omitted.
+- Passed: `./gradlew :app:assembleDebug :app:lintDebug`.
+- No Android phone was attached (`adb devices` empty); device touch/BLE validation remains unperformed.
+
 # v1.5 · 2026-10-30
 
 - Angular/Grade format is one decimal, with signed rounded-zero handling; full precision remains in calculations, calibration and GPS records.
@@ -59,3 +128,27 @@
 6. Background/resume, force-stop/reopen and test without internet. Existing records must persist; GPS must be manually enabled after app restart. With no internet, saved markers/list remain usable while uncached base-map tiles may be unavailable.
 
 Optional browser test: install Playwright with Chromium and run `node tests/map-preview.cjs`. `PLAYWRIGHT_CHROMIUM_EXECUTABLE` can select an existing Chromium executable. Test GPS data is injected only in the browser test, never packaged into the APK.
+
+
+## v1.10.0 — 2026-11-20
+
+Passed: assembleDebug, lintDebug; tracking.test.cjs, mobile-ui.test.cjs (3-second gate, forced flag, automatic recording), sessions.test.cjs, map-zoom.test.cjs (pinch and pan transition). Offline raster MBTiles import and GPS/gesture behavior on physical Android hardware have not been validated in this change. No regional map pack is bundled.
+
+APK SHA-256: 444a9b741a0e972fad3906720813718fb2c964db4afc6a0d1e4a690a14458fc5
+
+
+## v1.11.0 — 2026-11-20
+
+Passed assembleDebug/lintDebug; tracking, mobile-ui, sessions, map-zoom tests; Playwright app-flow browser test. Fetched a real OpenFreeMap vector tile using the application User-Agent and verified rendering with browser network disabled (372 sampled colors). Native OfflineTiles harness downloaded 69 tiles from a local HTTP fixture server, verified request identity, duplicate-download exclusion, durable reads from a new instance after server shutdown, and cancellation. Phone GPS and download lifecycle on physical Android hardware remain untested.
+
+SHA-256: 27da177fdf0a276abbc6fe4119ef6ee148bba856697c21694164c48984cdc520
+
+
+## v1.11.1 — English interface
+
+Translated recording states, force recording, map controls, downloads, native progress/errors, and legacy import messages to English. Map labels prefer English where available. No Han characters remain in app HTML/JS/Java or Android resources. Passed assembleDebug, lintDebug, mobile-ui.test.cjs and Playwright app-flow.test.cjs.
+
+
+## v1.11.2 — Map visibility fix
+
+Root cause: packaged CSP connect-src none blocked vector fetch requests. Changed to self to allow only native same-origin tiles. Kept map canvas visible before GPS acquisition and added delayed tile retries. The new map-page.test.cjs reproduces the old timeout using actual packaged HTML/CSP and Android asset origin; after the fix it verifies vector requests, painting with a real downloaded tile, no CSP errors, and visible canvas without GPS. Passed mobile-ui, app-flow and map-zoom tests plus assembleDebug/lintDebug. Inspected map screenshot and verified final APK contains the fix. No physical phone connected for device testing.

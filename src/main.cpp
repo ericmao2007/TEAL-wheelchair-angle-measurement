@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wire.h>
+#include <SPI.h>
 #include <Adafruit_BNO08x.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -18,7 +18,6 @@ constexpr const char *MODE="STATIC2:ACCGYRO:FUSION6:BNO086:SH2";
 // mode is an application protocol tag, not a BNO055 register value.
 constexpr uint8_t SENSOR_MODE=6;
 Adafruit_BNO08x bno(BNO_RESET);
-uint8_t address=BNO_ADDRESS;
 Vector latestAccel{},latestGyro{},latestGravity{};
 uint32_t attitudeAt=0;bool haveAttitude=false,newAttitude=false,imuCalibrating=false,imuSaved=false;
 uint8_t accelAccuracy=0,gyroAccuracy=0,attitudeAccuracy=0;
@@ -48,20 +47,21 @@ bool enableReports(){
  // Bind permanent storage before commands: SH-2 may dispatch sensor callbacks
  // while waiting for calibration/config acknowledgements.
  bno.getSensorEvent(&sensorEvent);
- return sh2_setCalConfig(SH2_CAL_GYRO|(imuCalibrating?SH2_CAL_ACCEL:0))==0
-   &&bno.enableReport(SH2_ACCELEROMETER,20000)
+ return bno.enableReport(SH2_ACCELEROMETER,20000)
    &&bno.enableReport(SH2_GYROSCOPE_CALIBRATED,20000)
-   &&bno.enableReport(SH2_GAME_ROTATION_VECTOR,10000);
+   &&bno.enableReport(SH2_GAME_ROTATION_VECTOR,10000)
+   &&sh2_setCalConfig(SH2_CAL_GYRO|(imuCalibrating?SH2_CAL_ACCEL:0))==0;
 }
 void initializeSensor(){
  sensorReady=false;haveAccel=haveGyro=newAccel=newGyro=haveAttitude=newAttitude=false;
  accelAccuracy=gyroAccuracy=attitudeAccuracy=0;
- for(int i=0;i<2;i++){
-  address=i?(BNO_ADDRESS==0x4B?0x4A:0x4B):BNO_ADDRESS;
-  if(bno.begin_I2C(address,&Wire)&&enableReports()){sensorReady=true;break;}
- }
+ const bool transportReady=bno.begin_SPI(BNO_CS,BNO_INT,&SPI);
+ sensorReady=transportReady&&enableReports();
+ Serial.printf("BNO086 transport=%d reports=%d INT=%d\n",transportReady,sensorReady,digitalRead(BNO_INT));
+ // The reset that led to this initialization has already been configured.
+ if(sensorReady)bno.wasReset();
  meter.reset();lastSample=millis();
- Serial.printf("BNO086 init=%d address=0x%02X mode=%s units=m/s2,deg/s NVS-six-face=%d\n",sensorReady,address,MODE,saved);
+ Serial.printf("BNO086 init=%d bus=SPI CS=%d INT=%d RST=%d mode=%s units=m/s2,deg/s NVS-six-face=%d\n",sensorReady,BNO_CS,BNO_INT,BNO_RESET,MODE,saved);
 }
 void pollSensor(){
  if(!sensorReady)return;
@@ -93,15 +93,28 @@ void sendFrame(){
  auto data=reinterpret_cast<const uint8_t*>(&frame);constexpr int count=(sizeof(Frame)+15)/16;
  for(int i=0;i<count&&connected;i++){uint8_t packet[20]={0xA6,uint8_t(frame.sequence),uint8_t(i),count};size_t size=std::min(size_t(16),sizeof(Frame)-i*16);memcpy(packet+4,data+i*16,size);telemetry->setValue(packet,size+4);telemetry->notify();delay(1);}
 }
+void logBleGap(esp_gap_ble_cb_event_t event,esp_ble_gap_cb_param_t *param){
+ if(event==ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT)Serial.printf("BLE advertising data status=%d\n",param->adv_data_raw_cmpl.status);
+ else if(event==ESP_GAP_BLE_SCAN_RSP_DATA_RAW_SET_COMPLETE_EVT)Serial.printf("BLE scan response status=%d\n",param->scan_rsp_data_raw_cmpl.status);
+ else if(event==ESP_GAP_BLE_ADV_START_COMPLETE_EVT)Serial.printf("BLE advertising start status=%d\n",param->adv_start_cmpl.status);
+}
 void setup(){
- Serial.begin(115200);Wire.begin(BNO_SDA,BNO_SCL);Wire.setClock(400000);Wire.setTimeOut(50);
+ Serial.begin(115200);
+ pinMode(BNO_CS,OUTPUT);digitalWrite(BNO_CS,HIGH);
+ SPI.begin(BNO_SCK,BNO_MISO,BNO_MOSI,BNO_CS);
  prefs.begin("bno086-static",false);imuSaved=prefs.getBool("dcd-saved",false);Calibration stored;
  if(prefs.getBytesLength("sixaxis-v1")==sizeof(stored)&&prefs.getBytes("sixaxis-v1",&stored,sizeof(stored))==sizeof(stored)&&stored.valid()){calibration=stored;saved=true;}
- initializeSensor();BLEDevice::init("MAO_SLOPE");auto server=BLEDevice::createServer();server->setCallbacks(new ServerCallbacks());auto service=server->createService(SERVICE);
+ initializeSensor();BLEDevice::init("MAO_SLOPE");BLEDevice::setCustomGapHandler(logBleGap);BLEDevice::setPower(ESP_PWR_LVL_P9);auto server=BLEDevice::createServer();server->setCallbacks(new ServerCallbacks());auto service=server->createService(SERVICE);
  telemetry=service->createCharacteristic(TELEMETRY,BLECharacteristic::PROPERTY_NOTIFY);telemetry->addDescriptor(new BLE2902());
  auto meta=service->createCharacteristic(METADATA,BLECharacteristic::PROPERTY_READ);meta->setValue(MODE);
  auto control=service->createCharacteristic(CONTROL,BLECharacteristic::PROPERTY_WRITE);control->setCallbacks(new Controls());service->start();
- BLEDevice::getAdvertising()->addServiceUUID(SERVICE);BLEDevice::getAdvertising()->setScanResponse(true);BLEDevice::startAdvertising();
+ // Keep each legacy BLE packet within its 31-byte limit.
+ BLEAdvertisementData advData,scanData;
+ advData.setFlags(0x06);advData.setCompleteServices(BLEUUID(SERVICE));
+ scanData.setName("MAO_SLOPE");
+ auto advertising=BLEDevice::getAdvertising();
+ advertising->setAdvertisementData(advData);advertising->setScanResponseData(scanData);
+ advertising->setScanResponse(true);advertising->setMinInterval(0x30);advertising->setMaxInterval(0x60);delay(100);advertising->start();
  Serial.println("STATIC2 ready; no automatic tare; commands IMUCAL,SAVEDCD,CALSTART,F0..F5,SAVE,CALCANCEL,CLEAR");
 }
 void loop(){

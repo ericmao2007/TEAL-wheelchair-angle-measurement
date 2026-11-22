@@ -1,0 +1,35 @@
+[
+  {
+    "restart": 1,
+    "init_ok": true,
+    "init_failures": 0,
+    "samples": 12,
+    "valid": 12,
+    "invalid": 0,
+    "stable": 1,
+    "decode_errors": 0,
+    "last": "STATIC t=12122 ok=1 state=3 norm=9.7611 noise=nan drift=nan roll=-4.0178 pitch=-24.5260 slope=24.8329 temp=-128 status=59 error=0"
+  },
+  {
+    "restart": 2,
+    "init_ok": true,
+    "init_failures": 0,
+    "samples": 12,
+    "valid": 12,
+    "invalid": 0,
+    "stable": 0,
+    "decode_errors": 0,
+    "last": "STATIC t=12143 ok=1 state=3 norm=9.7319 noise=nan drift=nan roll=-3.9681 pitch=-24.5977 slope=24.8960 temp=-128 status=59 error=0"
+  },
+  {
+    "restart": 3,
+    "init_ok": true,
+    "init_failures": 0,
+    "samples": 30,
+    "valid": 30,
+    "invalid": 0,
+    "stable": 5,
+    "decode_errors": 0,
+    "last": "STATIC t=30293 ok=1 state=5 norm=9.7361 noise=0.02247 drift=0.0079 roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0"
+  }
+]

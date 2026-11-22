@@ -1,0 +1,66 @@
+1 [   205][E][Preferences.cpp:503] getBytesLength(): nvs_get_blob len fail: sixaxis-v1 NOT_FOUND
+1 BNO086 transport=1 reports=1 INT=1
+1 BNO086 init=1 bus=SPI CS=1 INT=2 RST=4 mode=STATIC2:ACCGYRO:FUSION6:BNO086:SH2 units=m/s2,deg/s NVS-six-face=0
+1 STATIC2 ready; no automatic tare; commands IMUCAL,SAVEDCD,CALSTART,F0..F5,SAVE,CALCANCEL,CLEAR
+1 STATIC t=1017 ok=1 state=2 norm=9.7587 noise=nan drift=nan roll=-3.6134 pitch=-24.5584 slope=24.8065 temp=-128 status=59 error=0
+1 STATIC t=2021 ok=1 state=3 norm=9.7522 noise=nan drift=nan roll=-3.7879 pitch=-24.6476 slope=24.9190 temp=-128 status=59 error=0
+1 STATIC t=3039 ok=1 state=3 norm=9.7343 noise=nan drift=nan roll=-3.9497 pitch=-24.5307 slope=24.8272 temp=-128 status=59 error=0
+1 STATIC t=4042 ok=1 state=3 norm=9.7346 noise=nan drift=nan roll=-3.9565 pitch=-24.5759 slope=24.8728 temp=-128 status=59 error=0
+1 STATIC t=5048 ok=1 state=3 norm=9.7566 noise=nan drift=nan roll=-3.8957 pitch=-24.5388 slope=24.8272 temp=-128 status=59 error=0
+1 STATIC t=6059 ok=1 state=3 norm=9.7656 noise=nan drift=nan roll=-3.9457 pitch=-24.5765 slope=24.8718 temp=-128 status=59 error=0
+1 STATIC t=7078 ok=1 state=5 norm=9.7555 noise=0.05267 drift=0.0406 roll=-3.8206 pitch=-24.6590 slope=24.9349 temp=-128 status=59 error=0
+1 STATIC t=8096 ok=1 state=2 norm=9.7419 noise=nan drift=nan roll=-3.8343 pitch=-24.6211 slope=24.8995 temp=-128 status=59 error=0
+1 STATIC t=9112 ok=1 state=3 norm=9.7400 noise=nan drift=nan roll=-4.1863 pitch=-24.5121 slope=24.8452 temp=-128 status=59 error=0
+1 STATIC t=10113 ok=1 state=3 norm=9.7533 noise=nan drift=nan roll=-4.1638 pitch=-24.5126 slope=24.8421 temp=-128 status=59 error=0
+1 STATIC t=11114 ok=1 state=3 norm=9.7611 noise=nan drift=nan roll=-4.1564 pitch=-24.5196 slope=24.8479 temp=-128 status=59 error=0
+1 STATIC t=12122 ok=1 state=3 norm=9.7611 noise=nan drift=nan roll=-4.0178 pitch=-24.5260 slope=24.8329 temp=-128 status=59 error=0
+2 [   205][E][Preferences.cpp:503] getBytesLength(): nvs_get_blob len fail: sixaxis-v1 NOT_FOUND
+2 BNO086 transport=1 reports=1 INT=1
+2 BNO086 init=1 bus=SPI CS=1 INT=2 RST=4 mode=STATIC2:ACCGYRO:FUSION6:BNO086:SH2 units=m/s2,deg/s NVS-six-face=0
+2 STATIC2 ready; no automatic tare; commands IMUCAL,SAVEDCD,CALSTART,F0..F5,SAVE,CALCANCEL,CLEAR
+2 STATIC t=1017 ok=1 state=2 norm=9.7589 noise=nan drift=nan roll=-4.0825 pitch=-24.5567 slope=24.8730 temp=-128 status=59 error=0
+2 STATIC t=2023 ok=1 state=3 norm=9.7571 noise=nan drift=nan roll=-4.1393 pitch=-24.5560 slope=24.8811 temp=-128 status=59 error=0
+2 STATIC t=3026 ok=1 state=3 norm=9.7555 noise=nan drift=nan roll=-4.0789 pitch=-24.5095 slope=24.8259 temp=-128 status=59 error=0
+2 STATIC t=4041 ok=1 state=3 norm=9.7386 noise=nan drift=nan roll=-4.0573 pitch=-24.5387 slope=24.8514 temp=-128 status=59 error=0
+2 STATIC t=5060 ok=1 state=3 norm=9.7644 noise=nan drift=nan roll=-4.0417 pitch=-24.5749 slope=24.8847 temp=-128 status=59 error=0
+2 STATIC t=6065 ok=1 state=3 norm=9.7765 noise=nan drift=nan roll=-4.0252 pitch=-24.5823 slope=24.8894 temp=-128 status=59 error=0
+2 STATIC t=7082 ok=1 state=2 norm=9.7585 noise=nan drift=nan roll=-4.0104 pitch=-24.5894 slope=24.8942 temp=-128 status=59 error=0
+2 STATIC t=8100 ok=1 state=3 norm=9.7634 noise=nan drift=nan roll=-4.0029 pitch=-24.5895 slope=24.8932 temp=-128 status=59 error=0
+2 STATIC t=9114 ok=1 state=3 norm=9.7722 noise=nan drift=nan roll=-4.0293 pitch=-24.5758 slope=24.8837 temp=-128 status=59 error=0
+2 STATIC t=10119 ok=1 state=3 norm=9.7667 noise=nan drift=nan roll=-4.0653 pitch=-24.5475 slope=24.8612 temp=-128 status=59 error=0
+2 STATIC t=11125 ok=1 state=3 norm=9.7859 noise=nan drift=nan roll=-4.0183 pitch=-24.5349 slope=24.8417 temp=-128 status=59 error=0
+2 STATIC t=12143 ok=1 state=3 norm=9.7319 noise=nan drift=nan roll=-3.9681 pitch=-24.5977 slope=24.8960 temp=-128 status=59 error=0
+3 [   205][E][Preferences.cpp:503] getBytesLength(): nvs_get_blob len fail: sixaxis-v1 NOT_FOUND
+3 BNO086 transport=1 reports=1 INT=1
+3 BNO086 init=1 bus=SPI CS=1 INT=2 RST=4 mode=STATIC2:ACCGYRO:FUSION6:BNO086:SH2 units=m/s2,deg/s NVS-six-face=0
+3 STATIC2 ready; no automatic tare; commands IMUCAL,SAVEDCD,CALSTART,F0..F5,SAVE,CALCANCEL,CLEAR
+3 STATIC t=1019 ok=1 state=2 norm=9.7117 noise=nan drift=nan roll=-3.7715 pitch=-24.7967 slope=25.0639 temp=-128 status=59 error=0
+3 STATIC t=2024 ok=1 state=3 norm=9.8018 noise=nan drift=nan roll=-3.8315 pitch=-24.6533 slope=24.9309 temp=-128 status=59 error=0
+3 STATIC t=3032 ok=1 state=3 norm=9.7373 noise=nan drift=nan roll=-3.8402 pitch=-24.6726 slope=24.9511 temp=-128 status=59 error=0
+3 STATIC t=4050 ok=1 state=3 norm=9.7587 noise=nan drift=nan roll=-3.8714 pitch=-24.6512 slope=24.9346 temp=-128 status=59 error=0
+3 STATIC t=5056 ok=1 state=2 norm=9.7989 noise=nan drift=nan roll=-3.8471 pitch=-24.6568 slope=24.9366 temp=-128 status=59 error=0
+3 STATIC t=6058 ok=1 state=2 norm=9.7402 noise=nan drift=nan roll=-3.8323 pitch=-24.6472 slope=24.9250 temp=-128 status=59 error=0
+3 STATIC t=7076 ok=1 state=3 norm=9.7373 noise=nan drift=nan roll=-3.8508 pitch=-24.6532 slope=24.9336 temp=-128 status=59 error=0
+3 STATIC t=8076 ok=1 state=1 norm=9.7438 noise=nan drift=nan roll=-3.8538 pitch=-24.5900 slope=24.8716 temp=-128 status=59 error=0
+3 STATIC t=9093 ok=1 state=2 norm=9.7758 noise=nan drift=nan roll=-4.0046 pitch=-24.5293 slope=24.8340 temp=-128 status=59 error=0
+3 STATIC t=10102 ok=1 state=3 norm=9.7467 noise=nan drift=nan roll=-3.8878 pitch=-24.6157 slope=24.9019 temp=-128 status=59 error=0
+3 STATIC t=11110 ok=1 state=3 norm=9.7731 noise=nan drift=nan roll=-3.7892 pitch=-24.6616 slope=24.9330 temp=-128 status=59 error=0
+3 STATIC t=12121 ok=1 state=3 norm=9.7584 noise=nan drift=nan roll=-3.7748 pitch=-24.6328 slope=24.9026 temp=-128 status=59 error=0
+3 STATIC t=13127 ok=1 state=3 norm=9.7392 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=14132 ok=1 state=3 norm=9.7888 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=15136 ok=1 state=2 norm=9.7563 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=16145 ok=1 state=3 norm=9.7674 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=17162 ok=1 state=3 norm=9.7857 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=18178 ok=1 state=3 norm=9.7692 noise=nan drift=nan roll=-3.8392 pitch=-24.6040 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=19181 ok=1 state=3 norm=9.7756 noise=nan drift=nan roll=-3.8393 pitch=-24.6108 slope=24.8900 temp=-128 status=59 error=0
+3 STATIC t=20181 ok=1 state=2 norm=9.7806 noise=nan drift=nan roll=-3.8594 pitch=-24.5764 slope=24.8590 temp=-128 status=59 error=0
+3 STATIC t=21194 ok=1 state=3 norm=9.7573 noise=nan drift=nan roll=-3.8455 pitch=-24.5844 slope=24.8649 temp=-128 status=59 error=0
+3 STATIC t=22200 ok=1 state=3 norm=9.7716 noise=nan drift=nan roll=-3.8458 pitch=-24.5981 slope=24.8784 temp=-128 status=59 error=0
+3 STATIC t=23213 ok=1 state=3 norm=9.7571 noise=nan drift=nan roll=-3.8383 pitch=-24.5982 slope=24.8775 temp=-128 status=59 error=0
+3 STATIC t=24215 ok=1 state=3 norm=9.7454 noise=nan drift=nan roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=25221 ok=1 state=3 norm=9.7454 noise=nan drift=nan roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=26227 ok=1 state=5 norm=9.7689 noise=0.02316 drift=0.0177 roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=27232 ok=1 state=5 norm=9.7640 noise=0.02285 drift=0.0135 roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=28247 ok=1 state=5 norm=9.7511 noise=0.02265 drift=0.0191 roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0
+3 STATIC t=29283 ok=1 state=5 norm=9.7640 noise=0.02265 drift=0.0059 roll=-3.8385 pitch=-24.6051 slope=24.8843 temp=-128 status=59 error=0
+3 STATIC t=30293 ok=1 state=5 norm=9.7361 noise=0.02247 drift=0.0079 roll=-3.8310 pitch=-24.6052 slope=24.8833 temp=-128 status=59 error=0

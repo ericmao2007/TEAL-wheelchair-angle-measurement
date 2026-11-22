@@ -1,5 +1,7 @@
 # Wheelchair Angle Measurement
 
+[Project website](https://ericmao2007.github.io/wheelchair-angle-measurement/) · [Website media setup / 展示页素材配置](docs/README.md)
+
 An ESP32 and BNO086 project for measuring wheelchair tilt and slope, with Bluetooth Low Energy (BLE), an Android app, and a laptop browser viewer.
 
 The current firmware uses the BNO086's internal six-axis fusion. The sections below describe current operation first, followed by historical BNO055 implementation notes. Historical register settings, wiring, and operating modes do not apply to the current BNO086 firmware.
@@ -23,28 +25,30 @@ After confirmation, the correction applies to Pitch, Grade, the 3D view, and new
 
 The offset lasts for the current connection. Repeat the procedure after disconnection, a sensor restart, or a calibration change. Six-axis sensing provides no heading, so manually turn the device 180° along the slope without flipping it upside down. This estimates longitudinal zero offset; it does not correct scale error, arbitrary mounting rotation, or lateral Roll. The main screen also shows saved calibration records and filter status.
 
-## Current hardware: ESP32 + BNO086
+## Current hardware: XIAO ESP32S3 + BNO086 (SPI)
 
-The firmware uses Adafruit BNO08x 1.2.5 and its SH-2/SHTP report interface. It does not access BNO055 registers.
+The firmware uses a local copy of Adafruit BNO08x 1.2.5 in `lib/Adafruit_BNO08x` with local SPI polling, startup sequencing, and command timing fixes, and its SH-2/SHTP report interface. It does not access BNO055 registers.
 
 ### Wiring
 
 Disconnect power before wiring and follow the actual module labels. This table applies to a 3.3 V BNO086 breakout with supporting power circuitry, rather than the bare chip.
 
-| BNO086 module | ESP32 |
-|---|---|
-| 3V3 / 3.3V | 3V3 |
-| GND | GND |
-| SDA | GPIO21 |
-| SCL | GPIO22 |
-| RST / NRST | GPIO19 |
-| INT | Not required; this I²C driver polls the sensor |
+| XIAO ESP32S3 | GPIO | BNO086 module |
+|---|---|---|
+| D0 | 1 | CS |
+| D1 | 2 | INT |
+| D3 | 4 | RST / NRST |
+| D10 / MOSI | 9 | MOSI |
+| D9 / MISO | 8 | MISO |
+| D8 / SCK | 7 | SCK |
+| 3V3 | — | 3V3 |
+| GND | — | GND |
 
-Configure the module for I²C: PS0=0 and PS1=0. SparkFun Qwiic modules use this by default; check the schematic for other modules. Leave BOOT at its default high level to avoid entering the bootloader. SA0/ADR selects the address; the firmware tries 0x4B and 0x4A.
+Configure the module for SPI before powering it on: PS0=1 and PS1=1 at reset. Set the module's protocol-selection jumpers according to its schematic; the eight wires above alone do not select SPI. Leave BOOT at its default high level. See the [SparkFun BNO086 hardware guide](https://docs.sparkfun.com/SparkFun_VR_IMU_Breakout_BNO086_QWIIC/hardware_overview/).
 
-SDA and SCL need pull-ups to 3.3 V. SparkFun modules already include them. Do not connect signal pins to 5 V. For a module labeled only VIN, check its supply requirements before connecting it; VIN may differ from 3V3.
+The Adafruit driver uses hardware SPI at 1 MHz, mode 3, with INT required for communication and RST connected to D3. Pin settings are in [platformio.ini](platformio.ini). Use short wires, 3.3 V signals, and a shared ground.
 
-Current I²C speed is 400 kHz. GPIO settings are in [platformio.ini](platformio.ini). If RST is unavailable, set `BNO_RESET` to `-1` for software reset, although a reset wire is recommended. Use short wires and a shared ground. Repeated disconnections require checking wiring and pull-ups; SPI may be an alternative if needed.
+The PlatformIO board is `seeed_xiao_esp32s3`, with native USB CDC enabled by the board definition. Upload and monitor ports are automatically detected instead of using the previous ESP32 USB-to-serial port. Override the port if multiple devices are connected.
 
 ### Build, flash, and monitor
 
@@ -58,7 +62,7 @@ pio device monitor --baud 115200
 
 On the original development machine, the executable is `/Users/ericmao/.platformio/penv/bin/pio`. Add `--upload-port <port>` if automatic port detection fails.
 
-Startup should print `BNO086 init=1`, followed by `ok=1` during operation. The BLE device name is `MAO_SLOPE`; service UUIDs remain unchanged. Reports older than 120 ms invalidate the reading. Prolonged report loss triggers reinitialization, and sensor resets trigger report resubscription.
+Startup should print `BNO086 init=1`, followed by `ok=1` during operation. The BLE device name is `MAO_SLOPE`; service UUIDs remain unchanged. BLE uses separate service/name advertising packets, +9 dBm transmit power, and 30–60 ms advertising intervals. Connect from TEAL Tilt rather than looking for a Wi-Fi network. Reports older than 120 ms invalidate the reading. Prolonged report loss triggers reinitialization, and sensor resets trigger report resubscription.
 
 Confirm the module's X/Y/Z markings when mounting it. Adjust `AXES` in [include/inclinometer.h](include/inclinometer.h) when the mounting changes. BNO086 diagnostic six-face coefficients use NVS namespace `bno086-static`, key `sixaxis-v1`, separately from old BNO055 coefficients.
 

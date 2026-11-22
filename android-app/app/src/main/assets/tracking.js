@@ -9,13 +9,18 @@ const distance=(a,b)=>{
 class StableCapture {
  constructor(){this.reset();}
  reset(){this.samples=[];this.lastTime=null;this.key=null;}
+ spread(){
+  if(!this.samples.length)return null;
+  const mean=k=>this.samples.reduce((s,v)=>s+v[k],0)/this.samples.length;
+  return {pitch:Math.max(...this.samples.map(s=>Math.abs(s.pitch-mean('pitch')))),roll:Math.max(...this.samples.map(s=>Math.abs(s.roll-mean('roll'))))};
+ }
  update(reading,time,key){
   if(!reading||![time,reading.pitch,reading.roll].every(Number.isFinite)){this.reset();return null;}
   if(this.lastTime!==null&&(time<=this.lastTime||time-this.lastTime>750)||key!==this.key)this.reset();
   this.key=key;this.lastTime=time;this.samples.push({time,pitch:reading.pitch,roll:reading.roll});
-  // Keep the sample straddling the 5-second boundary, so coverage is never short.
-  while(this.samples.length>1&&this.samples[1].time<=time-5000)this.samples.shift();
-  if(time-this.samples[0].time<5000||this.samples.length<5)return null;
+  // Keep the sample straddling the 3-second boundary, so coverage is never short.
+  while(this.samples.length>1&&this.samples[1].time<=time-3000)this.samples.shift();
+  if(time-this.samples[0].time<3000||this.samples.length<5)return null;
   const mean=axis=>this.samples.reduce((s,v)=>s+v[axis],0)/this.samples.length;
   const pitch=mean('pitch'),roll=mean('roll');
   if(this.samples.some(s=>Math.abs(s.pitch-pitch)>.2+1e-9||Math.abs(s.roll-roll)>.2+1e-9))return null;

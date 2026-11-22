@@ -1,3 +1,107 @@
+## v1.11.0 — App 内直接下载离线地图
+
+不需要手动导入地图包。地图默认联网获取 OpenFreeMap 矢量数据并保存到本地。定位或移动地图后点击“下载地图中心周边 5 公里”，下载该中心周边区域的 0–14 级地图，下载完成后可关闭在线补图、断网拖动和缩放。超过 14 级继续放大已有矢量内容，不新增更细数据。字体、绘制代码全部内置，不依赖在线脚本和字体。已存地图重启后保留；清除 App 数据或卸载会删除。失败后可重试，已下载瓦片会复用，支持取消。单次区域下载最多 3000 瓦片、50 MB，单线程请求，使用 App 专属 User-Agent。实际下载范围为以中心经纬度计算的约 10×10 公里矩形。范围外需要另外下载。
+
+数据来源和许可：OpenFreeMap、OpenMapTiles、OpenStreetMap contributors。下载规范：https://openfreemap.org/tos/ 。地图内置基础道路、水域、建筑与地名样式；不提供路线导航。
+
+## v1.10.0 — 3 秒稳定记录与离线地图
+
+Start 后两轴在连续 3 秒内各自距离窗口均值不超过 ±0.2°，显示绿色并保存窗口均值，持续稳定时最多每 3 秒保存一次。未稳定显示红色及两轴最大偏差，可按“不建议记录 · 强制记录”保存当前值；强制标记、窗口偏差随 CSV/HTML 导出。波动不等于绝对误差。无有效传感器读数或校准中不能强制记录。无 GPS 仍保存角度，地图点需要有效 GPS，自动地图点仍去重。
+
+地图支持双指以手势中心缩放和单指拖动。默认离线模式，测量、历史和测点可完全离线使用。点击“导入离线地图”选择所需区域的 **PNG/JPG 栅格 MBTiles（标准 TMS 行号）**；不支持 PBF 矢量 MBTiles。地图包复制到 App 本地，重启后保留；不包含地图包的区域或缩放等级无法显示街道底图。可选开启在线补图；无需联网使用已导入底图。App 未内置全球街道数据。手机 GPS 在无网时首次定位可能更慢。
+
+以下为历史版本说明，当前记录规则以本节为准。
+
+# v1.9.0 · Direct readings, simple calibration, phone location
+
+Install `dist/TEAL-Tilt-1.9.0-debug.apk` (versionCode 18).
+
+- Connecting opens readings and 3D immediately. No calibration or Set Zero prerequisite.
+- Calibration starts with three buttons: Sensor calibration, 180° zero, Set zero. Each opens a separate guide; manual steps replace automatic playback by default.
+- Sensor profiles remain stored on the sensor. 180° offsets and reference zero are saved automatically on the phone and restored next launch. The two-click arithmetic remains `(first + second) / 2` without motion/stability/calibration gates.
+- Map requests phone location independently of recording, accepts approximate location for map centering, displays a blue You marker, and avoids a default world view while waiting for the first fix. GPS recording still requires the existing precise-fix rules.
+- BLE survives brief activity pauses (30-second grace), resume avoids redundant scanning, and telemetry timeout uses incoming packet activity with a 30-second tolerance. GATT disconnect codes appear in status/logcat. Longer backgrounding still pauses BLE; continuous background recording is not implemented.
+
+# v1.8.2 · Direct two-click reversal zero
+
+180° zero records the latest raw Pitch at each click and immediately applies `(first + second) / 2` as the zero offset. No stability, movement, freshness, turn, calibration-profile or sensor-state gate is used for the two clicks. Offset remains until manually cleared, replaced or app restart; disconnect/calibration changes no longer cancel the pair or clear the offset. Missing/non-numeric angle data cannot supply a sample.
+
+APK: `dist/TEAL-Tilt-1.8.2-debug.apk` (versionCode 17).
+
+# v1.8.1 · Optional calibration
+
+Calibration is optional after connecting. Select **Skip calibration · Set Zero** to continue without a saved calibration. An active calibration must finish or be cancelled before zeroing. Connection and Set Zero remain required before live readings appear.
+
+APK: `dist/TEAL-Tilt-1.8.1-debug.apk` (versionCode 16).
+
+# v1.8.0 · Guided device setup
+
+Install `dist/TEAL-Tilt-1.8.0-debug.apk` (versionCode 15).
+
+Start offers **Connect Device** and **View History**. Connection, saved sensor calibration, and explicit Set Zero are required before readings or 3D appear. An existing saved calibration can be reused via Continue. Disconnect/restart/calibration changes reset setup. History works offline and each session has View data and a GPS map shortcut. Delete now uses an Android confirmation dialog. Empty maps request a world base map; map tiles require internet.
+
+# v1.7.1 · Upright 2D wheelchair reversal guide
+
+Replaced the rotating block with two 2D wheelchair side views: measure facing uphill, then facing downhill. Both poses keep wheels on the same slope and the rider upright. Playback switches between the two illustrations; no intermediate flip is drawn. Step captions explain turning around on the ground, holding still and preserving the sensor mounting. Existing two-click calibration math/commands are unchanged.
+
+APK: `dist/TEAL-Tilt-1.7.1-A16-debug.apk` (versionCode 14).
+
+# v1.7.0 · Dedicated calibration page and animated guides
+
+Calibrate is now a separate bottom-navigation page. Measure keeps readings, reference zero and optional 3D only. Calibration controls and status remain connected to the existing BLE commands.
+
+Four bundled, offline CSS demonstrations explain reversal zero (same-face 180° turn), BNO086 IMU orientation changes, legacy six-face axis-up placement, and relative zero. Each has Play/Pause and Previous/Next controls with step captions. Motion advances only on the active calibration page in expanded, sensor-appropriate sections. Reduced-motion preference disables automatic playback by default and removes transitions; manual stepping remains available. Demonstration steps never send calibration commands or infer live placement. Sensor profile controls remain gated by actual validity and accuracy.
+
+APK: `dist/TEAL-Tilt-1.7.0-A16-debug.apk`, versionCode 13.
+
+# v1.6.2 · Dual-axis readings and close-up map
+
+Removed the oversized single Pitch reading. Measure now shows X/Y columns with Gradient (%) first and Angle (°) second. Gradient is slightly larger. X ↔ Y swaps both rows and their axis labels without changing calibration, recording or exported axes. X uses Pitch and Y uses Roll; each gradient is 100 × tan(the corresponding displayed angle). Relative zero and reversal correction still apply. 3D is collapsed by default.
+
+Map zoom now reaches 26 (previously 19): up to 128× further linear magnification, with native zoom-19 tiles scaled locally. No unsupported zoom-20+ OSM tile requests are made. Saved marker positions remain coordinate-based; magnification does not improve GPS accuracy or add base-map detail. Map canvas height also increased.
+
+Install `dist/TEAL-Tilt-1.6.2-A16-debug.apk` (versionCode 12).
+
+# v1.6.1 · Galaxy A16 layout (2026-11-13)
+
+Phone-first responsive layout: prominent Start/Stop at the top, collapsible GPS options, large angle readout, shorter 3D canvas, two-column actions, full-width destructive action, and 48px minimum button targets. History rows are large checkbox labels. Simplified Measure/Map/History navigation adapts to narrow screens and landscape. Existing native system-bar/cutout insets remain in use. Layout follows logical CSS viewport size rather than hardcoding panel resolution.
+
+Install `dist/TEAL-Tilt-1.6.1-A16-debug.apk` (versionCode 11, same app ID/signature). Browser checks covered 360/384/412/432px portrait and 780×360 landscape, each page, 48px touch heights, no horizontal overflow, and increased control font size. Functional tests, Android build and lint passed. Physical Galaxy A16 verification remains outstanding.
+
+# v1.6.0 · Sessions and export (2026-11-13)
+
+- Start / Stop creates independent sessions, saving valid angles once per second. Start enables phone GPS. Stop disables GPS. Missing/stale/imprecise GPS is stored as blank coordinates; BLE disconnect/background pauses samples. No background recording service is introduced.
+- History supports multi-selection, CSV/standalone HTML export of all or selected sessions, and confirmed deletion of selected stopped sessions together with their map points. Files are saved through the Android system file picker. Data remains local. Previous saved map points import as one legacy session.
+- Export includes session ID/start/stop, sample time, Pitch/Roll/Grade, GPS latitude/longitude/accuracy/time, reference type, IMU-saved flag and reversal offset. Samples are limited to 50,000 across history; export/delete older sessions when full.
+- Reversal calibration accepts valid fused gravity even if the separate diagnostic measurement state is zero. Snapshot failures show feedback, and applying the offset immediately refreshes the filtered display. Two clicks use raw current angles; IMU calibration is unchanged. Physical 180° placement still requires user verification.
+- APK: `dist/TEAL-Tilt-1.6.0-debug.apk`, same application ID, versionCode 10.
+
+# v1.5.3 · TEAL Tilt
+
+桌面应用名称及界面标题改为 **TEAL Tilt**。安装 `dist/TEAL-Tilt-debug.apk`，保留原应用 ID，可覆盖更新。构建、lint 及界面回归测试通过。
+
+---
+
+# v1.5.2 · 两次点击完成 180° 校准
+
+1. 放稳设备，点 **Record first angle**，立即记录当前传感器 Pitch。
+2. 在同一坡面、同一面贴地调头 180°，放稳后点 **Record opposite & apply**。
+3. 立即应用零偏 `(第一次角度 + 第二次角度) / 2`，无需等待稳定窗口或再点确认。例如 −8°、+12° 得零偏 +2°，修正后分别为 −10°、+10°。
+
+记录未经 App 显示平滑、相对归零或旧对向零偏修正的当前角度，重复校准不会叠加。仅要求在线有效读数且未处于 IMU/六面校准；不再设置 5 秒、角速度或质量等级门槛。请自行放稳后点击。角度、Grade、3D 和新 GPS 记录使用同一零偏。断线、传感器重启或校准变更后清除。
+
+安装包已生成：`dist/LiveTilt-debug.apk`（v1.5.2，versionCode 8）。Debug 构建、lint 和 APK 签名验证通过；未做真实手机验证。以下为历史版本说明。
+
+---
+
+# v1.5.1 · 修复界面按键无响应
+
+- 修复 Android WebView 本地资源白名单遗漏 `reversal.js` 导致脚本初始化中断的问题；连接、GPS、地图和对向校正事件现在能够完成绑定。
+- 补充回归检查：HTML 引用的每个本地脚本必须存在，并被原生 WebView 白名单放行。
+- 安装包：`app/build/outputs/apk/debug/app-debug.apk`，可覆盖安装。
+
+---
+
 # v1.5 · 一位小数与更长平均（2026-10-30）
 
 - 主 Pitch、Roll、Grade、对向零偏/坡度以及地图角度均显示小数点后 1 位；计算、BLE、校准系数和保存记录保持完整精度，经纬度不降精度。
