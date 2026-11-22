@@ -1,51 +1,51 @@
-# 验证记录（2026-10-16）
+# Validation record (2026-10-16)
 
-## 已完成的软件验证
+## Completed software validation
 
-- 默认 ACCONLY 与可选 ACCGYRO 均通过 PlatformIO 编译。最终 ACCONLY 构建已烧录到 `/dev/cu.usbserial-0001`，烧录 hash 检查通过。
-- 原生 C++ `tests/inclinometer_test.cpp` 通过：角度符号/百分比、倒置、反复翻转后同向重测、震动后重新测量真实新角度、数据失效/断流、1g 下缓慢倾斜拒绝、可用 gyro 的持续旋转拒绝、±180° 分支、可关闭低通、六面偏置/比例求解、0.001° 小方向变化分辨率。
-- 15 项 Python 单元测试通过：旧/新 BLE 协议片段及字段映射、丢片/乱序/跨版本拒绝、日志、标记归组、初次稳定不能冒充恢复时间、防止覆盖日志、分析报告与绝对误差边界等。历史数学辅助测试保留，不表示主程序仍使用融合。
-- 网页在 Chrome 真实加载；无脚本控制台错误；已检查有效读数、等待稳定时撤下当前结果、带时间的“上次有效测量”、相对归零与绝对值分离、校准按钮状态。
+- Default ACCONLY and optional ACCGYRO both compiled with PlatformIO. The final ACCONLY build was flashed to `/dev/cu.usbserial-0001`; upload hash verification passed.
+- Native C++ `tests/inclinometer_test.cpp` passed: angle signs/grade, inversion, same-direction remeasurement after repeated flips, measurement of a genuinely new angle after vibration, invalid data/stream interruption, rejection of slow tilting at 1g, rejection of sustained rotation when gyro is available, the ±180° branch, optional low-pass filtering, six-face bias/scale solving, and resolution of 0.001° direction changes.
+- Fifteen Python unit tests passed: legacy/new BLE fragments and field mapping, missing/out-of-order/cross-version rejection, logging, marker grouping, preventing initial stability from being reported as recovery, preventing log overwrites, analysis reports, and limits on absolute-error claims. Historical math-helper tests remain; this does not mean the main program still uses fusion.
+- The page loaded in Chrome without script-console errors. Checks covered valid readings, withdrawal of current results while awaiting stability, timestamped last-valid measurements, separation of relative zero from absolute readings, and calibration-button states.
 
-## 已完成的有限实机检查
+## Completed limited hardware checks
 
-- 实机 metadata 为 `STATIC2:ACCONLY`；读取的 mode=1、SYS_STATUS=6、SYS_ERR=0。gyro 为不可用，不读取融合姿态、gravity 或 linear acceleration。
-- 第一次独立 WebSocket 检查收到 191 帧，检查结束时 bridge 报告 0 不完整片段；之后其他阶段出现丢片，bridge 正确丢弃，未拼接跨帧。
-- 六面控制流程检查：CALSTART 后等待稳定；六面未齐 SAVE 返回 3；当前方向不匹配的 F0 返回 2；CALCANCEL 返回 6。**没有采集真实六面，也没有写入虚假校准。当前 NVS 六面校准为空。**
-- 已确认网页相对归零仅更新页面内相对方向，绝对读数没有被设置为零。
+- Hardware metadata was `STATIC2:ACCONLY`; reported mode=1, SYS_STATUS=6, SYS_ERR=0. Gyro was unavailable; fused orientation, gravity, and linear acceleration were not read.
+- The first independent WebSocket check received 191 frames and ended with zero incomplete fragments reported by the bridge. Fragment loss occurred in later phases; the bridge discarded those fragments correctly without cross-frame assembly.
+- Six-face control checks: CALSTART waited for stability; SAVE with incomplete faces returned 3; F0 with a mismatched orientation returned 2; CALCANCEL returned 6. **No real six-face samples were collected and no fabricated calibration was written. NVS six-face calibration was empty.**
+- Confirmed that browser relative zero only updates the in-page relative direction; absolute readings were not set to zero.
 
-### 初始短期观察（不是绝对精度试验）
+### Initial short observation (not an absolute-accuracy test)
 
-`initial-static.csv` / `initial-report.json` 为开发阶段、未六面校准的独立快照：281 个稳定样本，覆盖 29.546 秒。
+`initial-static.csv` / `initial-report.json` are independent development snapshots without six-face calibration: 281 stable samples over 29.546 seconds.
 
-- 总倾角均值约 74.5905°，峰峰值 **0.02634°**，SD **0.00441°**，相对该段均值的最大偏差约 0.01403°。
-- 内部温度读数 23–24°C。
-- 这是未确认基准姿态的短期观察，样本经低通且窗口重叠，不独立；不能当作精度、置信区间或长期漂移。
-- 最终版本另外改进了小方向差的 atan2(cross,dot) 诊断，避免 float acos 在接近零时损失分辨率；倾角计算管线仍为加速度向量低通/平均。
+- Mean total tilt approximately 74.5905°, peak-to-peak **0.02634°**, SD **0.00441°**, and maximum deviation from the segment mean approximately 0.01403°.
+- Internal temperature readings: 23–24°C.
+- This short observation had no confirmed reference orientation. Samples were low-pass filtered and used overlapping windows, so they were not independent. These values do not establish accuracy, confidence intervals, or long-term drift.
+- The final version also improved small-direction diagnostics with atan2(cross,dot), avoiding float acos resolution loss near zero. The tilt pipeline still used acceleration-vector low-pass filtering and averaging.
 
-### 最终固件的动态/等待状态检查
+### Dynamic/waiting-state checks with the final firmware
 
-`final-static.csv` / `final-report.json`：覆盖约 20.282 秒，140 帧中仅 13 帧通过稳定条件。其余为移动/等待/采样状态，当前角度为空。此段原始加速度方向明显变化，**不能作为固定姿态静置测试**；不从这 13 个筛选样本声称达到某个精度。最终实机仍确认 mode=1、status=6、error=0；过渡期间的不完整片段计数有增加。
+`final-static.csv` / `final-report.json` span approximately 20.282 seconds. Only 13 of 140 frames passed stability criteria; the others were moving/waiting/sampling states with empty current angles. Raw acceleration direction changed noticeably, so **this is not a fixed-pose stationary test**. No accuracy claim is made from the 13 selected samples. Final hardware status remained mode=1, status=6, error=0; incomplete-fragment counts increased during transitions.
 
-开发过程日志 `static-session.csv` / `static-live.csv` 混有校准流程、固件重启和可能的姿态变化，不作为长时静置实验。首次连接已处于稳定状态时，没有观测到恢复起点，分析器不会把它报告为恢复时间。报告中的恢复时间也只是接收端状态变化，不是精确的机械落座时刻。
+Development logs `static-session.csv` / `static-live.csv` mix calibration, firmware restarts, and possible orientation changes; they are not long stationary experiments. When the first connection is already stable, no recovery starting point is observed, so the analyzer does not report it as recovery time. Reported recovery times describe receiver state changes, not precise mechanical placement times.
 
-## 尚未完成 / 不能据此承诺
+## Incomplete checks and limits on claims
 
-- 真实六面采样、NVS 保存及断电重启加载验证：需要用户摆放六个方向；目前只有系数求解的合成测试及拒绝/取消流程的实机验证。
-- 同一定位底座多次拿起、翻转、放回的受控重复性试验；需要每次放回有人工标记。
-- 不动底座的 10–30 分钟温度/漂移试验。程序已支持连续记录与按分钟分析，但此次未完成这项受控实验。
-- 与已知角度参考仪器的绝对精度验证。**±0.1°绝对精度未验证，不承诺“无误差”或“所有震动后绝不漂移”。**
-- ACCGYRO 的实机运动门限调校；目前默认 ACCONLY，ACCGYRO 只做了编译与原生算法测试。
-- 六面法不能完整修正轴不正交、任意安装误差、温漂或真实机械位置变化。
+- Real six-face sampling, NVS saving, and reload after power cycling require placement in six orientations. Only synthetic coefficient-solving tests and hardware rejection/cancellation checks were completed.
+- Controlled repeated lifting, flipping, and returning to the same locating base, with a manual marker for each return.
+- A 10–30 minute temperature/drift test without moving the base. Continuous logging and per-minute analysis are supported, but this controlled experiment was not completed.
+- Absolute accuracy against a known-angle reference instrument. **±0.1° absolute accuracy is unverified. No zero-error or drift-free-after-all-vibration guarantee is made.**
+- Hardware motion-threshold tuning for ACCGYRO. ACCONLY was the default at the time; ACCGYRO received compilation and native algorithm tests only.
+- Six-face calibration cannot fully correct nonorthogonal axes, arbitrary mounting error, temperature drift, or actual mechanical position changes.
 
-## 当前运行状态与复测
+## Runtime state and retesting at the time of this record
 
-最终网页：http://127.0.0.1:8765 。正式新日志会话写入 `diagnostics/measurements.csv`，旁边 `.meta.json` 是启动时源码配置快照/单位等元数据，不是设备自动认证的配置。保持设备与底座不动即可继续记录；不要在静置实验中校准、归零、重启或烧录。
+Final viewer: http://127.0.0.1:8765 . The new formal logging session wrote to `diagnostics/measurements.csv`; the adjacent `.meta.json` contains a startup source-configuration snapshot, units, and other metadata, rather than device-certified configuration. Keep the device and base stationary to continue logging. Do not calibrate, zero, restart, or flash during a stationary experiment.
 
-完整步骤及公式见根目录 README.md。10–30 分钟结束后使用：
+See the root README.md for full steps and formulas. After 10–30 minutes, run:
 
 ```sh
 .venv/bin/python laptop/analyze_log.py diagnostics/measurements.csv --output diagnostics/measurements-report.json
 ```
 
-人工归位实验中离开前标记 `moving`，同一底座同方向放回后依次标记 `return-1`、`return-2` 等；不同方向或不同底座不能作为同一归位误差比较。
+For manual return-position experiments, mark `moving` before lifting. After returning to the same base in the same direction, mark `return-1`, `return-2`, and so on. Different directions or bases must not be compared as the same return-position error.

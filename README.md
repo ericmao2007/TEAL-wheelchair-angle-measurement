@@ -1,6 +1,6 @@
 # Wheelchair Angle Measurement
 
-[Project website](https://ericmao2007.github.io/wheelchair-angle-measurement/) · [Website media setup / 展示页素材配置](docs/README.md)
+[Project website](https://ericmao2007.github.io/wheelchair-angle-measurement/) · [Website media setup](docs/README.md)
 
 An ESP32 and BNO086 project for measuring wheelchair tilt and slope, with Bluetooth Low Energy (BLE), an Android app, and a laptop browser viewer.
 

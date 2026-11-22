@@ -47,15 +47,15 @@ Passed: mobile-ui integration (including Start/Stop, persisted samples, distinct
 
 Not tested on a physical phone: BLE/180° mechanical placement, phone GPS permission flow, and Android system file-picker export. Background recording is intentionally paused. Debug signing retained; no firmware changes in this update.
 
-# v1.5.2 两次点击对向校准验证
+# v1.5.2 two-click reversal calibration validation
 
-- `node tests/reversal.test.cjs`：通过；立即记录、第二次自动平均应用、重复校准、取消及无效向量。
-- `node tests/mobile-ui.test.cjs`：通过；两次点击无需稳定窗口，Pitch/Grade/3D/GPS 修正及断线、重启、校准变更清除。
-- `node tests/tracking.test.cjs`：通过；GPS 稳定采样逻辑保持通过。
-- `./gradlew :app:assembleDebug :app:lintDebug`：通过；SDK 已安装到持久目录。
-- `apksigner verify --print-certs`：通过；APK 版本 1.5.2 / versionCode 8。
-- APK 中 `reversal.js` / `index.html` 与当前源码逐字节一致。
-- 已更新 `dist/LiveTilt-debug.apk`；未做真实手机验证。
+- `node tests/reversal.test.cjs`: passed immediate capture, automatic averaging/application on the second click, repeated calibration, cancellation, and invalid vectors.
+- `node tests/mobile-ui.test.cjs`: passed two clicks without a stability window, Pitch/Grade/3D/GPS correction, and clearing on disconnect, restart, or calibration changes.
+- `node tests/tracking.test.cjs`: passed; GPS stable-sampling logic remains covered.
+- `./gradlew :app:assembleDebug :app:lintDebug`: passed; the SDK was installed in a persistent directory.
+- `apksigner verify --print-certs`: passed; APK version 1.5.2 / versionCode 8.
+- APK copies of `reversal.js` / `index.html` matched current source byte for byte.
+- Updated `dist/LiveTilt-debug.apk`; no physical phone validation was performed.
 
 ---
 
