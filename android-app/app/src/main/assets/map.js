@@ -52,7 +52,7 @@ class GradientMap {
     img.onload=()=>this.draw();img.onerror=()=>{this.failed=true;img.retryAt=Date.now()+10000;this.draw();};
     img.src=window.LiveTiltAndroid?`https://appassets.androidplatform.net/tiles/${key}.png`:`https://tile.openstreetmap.org/${key}.png`;
    }
-   if(img.complete&&img.naturalWidth){if(img.canvas?.paint)img.canvas.paint(c,x*tileSize-left,y*tileSize-top,tileSize);else c.drawImage(img.canvas||img,x*tileSize-left,y*tileSize-top,tileSize,tileSize);}
+   if(img.complete&&img.naturalWidth){if(img.canvas?.paint)img.canvas.paint(c,x*tileSize-left,y*tileSize-top,tileSize,this.zoom);else c.drawImage(img.canvas||img,x*tileSize-left,y*tileSize-top,tileSize,tileSize);}
   }
   if(this.currentLocation){
    const v=this.project(this.currentLocation);let dx=v[0]-this.center[0];dx-=Math.round(dx/size)*size;
