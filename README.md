@@ -1,4 +1,4 @@
-# Wheelchair Angle Measurement
+# Team TEAL - Wheelchair Angle Measurement
 
 [Project website](https://ericmao2007.github.io/wheelchair-angle-measurement/) · [Website media setup](docs/README.md)
 
