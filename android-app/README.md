@@ -1,3 +1,7 @@
+## v1.12.1 — Restore button initialization on Android
+
+Allow the bundled `mount.js` through the native WebView resource allowlist. In 1.12.0 this script was blocked, aborting initialization before navigation and connection handlers were registered. The existing two-pose mounting calibration is unchanged. The browser flow test now checks all script references against the native allowlist and serves only allowed assets.
+
 ## v1.12.0 — Wheelchair mounting calibration
 
 Calibrate → Wheelchair mounting · XYZ compensates an arbitrarily rotated, rigid sensor installation. First capture the empty, secured chair on a known level surface. Then capture it facing straight uphill on a supported 5–30° ramp, with no cross slope. Each capture requires at least 3 seconds of valid gravity and gyro samples, gyro magnitude ≤1°/s, gravity magnitude within 0.5 m/s² of standard gravity, and gravity direction within 0.2° of the window mean. These are stability checks, not an accuracy guarantee.

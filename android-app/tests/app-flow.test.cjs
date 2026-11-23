@@ -2,9 +2,13 @@
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const fs=require('node:fs'),http=require('node:http'),path=require('node:path'),assert=require('node:assert/strict');
 const assets=path.resolve(__dirname,'../app/src/main/assets');
+// Match Android's packaged-resource allowlist instead of serving every local file.
+const activity=fs.readFileSync(path.resolve(__dirname,'../app/src/main/java/com/maoslope/livetilt/MainActivity.java'),'utf8');
+const allowedAssets=new Set([...activity.matchAll(/path\.equals\("([^"]+)"\)/g)].map(m=>m[1]));
+for(const [,name] of fs.readFileSync(path.join(assets,'index.html'),'utf8').matchAll(/<script src="([^"]+)"/g))assert(allowedAssets.has(name),'Android WebView blocks required script: '+name);
 const fixture=Buffer.from(JSON.parse(fs.readFileSync(path.join(__dirname,'fixture.json'))).base64,'base64');
 const frame=p=>{const b=Buffer.from(fixture);b[129]=1|8|16|32|128;b[132]=6;b[133]=63;[9.80665*Math.sin(p*Math.PI/180),0,9.80665*Math.cos(p*Math.PI/180)].forEach((v,i)=>b.writeFloatLE(v,32+i*4));return b.toString('base64');};
-const server=http.createServer((req,res)=>{const file=path.join(assets,path.basename(req.url==='/'?'index.html':req.url));if(!fs.existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':'text/html');res.end(fs.readFileSync(file));});
+const server=http.createServer((req,res)=>{const file=path.join(assets,path.basename(req.url==='/'?'index.html':req.url));if(!allowedAssets.has(path.basename(file))||!fs.existsSync(file)){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':'text/html');res.end(fs.readFileSync(file));});
 (async()=>{let browser;try{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));browser=await chromium.launch({headless:true,channel:'chrome'});
  const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
