@@ -1,33 +1,3 @@
-## v1.12.3 — Visible calibration activity and actionable outcomes
-
-All calibration pages now show a live sensor update counter and sample age; active IMU/six-face/mounting/reversal workflows also show elapsed time or sample progress and their next action. Stale/disconnected data is explicitly marked instead of animating as though samples are still arriving. IMU saving lists missing quality/stability conditions; six-face calibration lists accepted count, remaining axes, and stationary readiness. Reversal and Set zero explain the reference/correction applied, or why capture is unavailable. Mounting keeps the existing two-pose algorithm and measured-angle/stability diagnostics.
-
-Device commands show requested → confirmed, device-reported rejection, disconnected-before-confirmation, or unconfirmed after eight seconds. The BLE protocol has no request identifiers, so an unchanged repeated response is reported as unconfirmed rather than assumed successful. No automatic retry is sent. Device errors without more detailed telemetry are described as such. Phone persistence failures are distinguished from calibration applied only for the current session. Zero no longer labels a rejected click as successful.
-
-Regression validation covers native WebView script routing, activity counters, IMU quality blockers and confirmation, command timeout, wrong-face rejection, six-face progress/save, phone storage failure, stale-data disabling, mounting, and responsive layouts. APK version 1.12.3 (26); no firmware/protocol change. Actual phone/sensor validation remains outstanding.
-
-## v1.12.2 — Explain mounting capture failures and accept gentle ramps
-
-Keep the same level + uphill method. Accept a 2–30° separation between captured gravity vectors (previously 5–30°). This is a change from the first reference, independent of sensor mounting orientation. Shallow 2–5° captures are more sensitive to noise. The forward pose must still have no cross slope, which this algorithm cannot verify. Rejections now state the measured angle and actual limit; they no longer imply that cross slope was detected. Live feedback shows tilt from step 1, stable readiness, sample duration, gyro motion, and gravity validity. Sensor XYZ axes need not be aligned physically. Two poses differing only in flat-ground heading cannot determine forward.
-
-Regression tests include arbitrary mounting at 4° forward tilt and a same-pose rejection followed by a successful gentle-ramp retry. Version 1.12.2 (25).
-
-## v1.12.1 — Restore button initialization on Android
-
-Allow the bundled `mount.js` through the native WebView resource allowlist. In 1.12.0 this script was blocked, aborting initialization before navigation and connection handlers were registered. The existing two-pose mounting calibration is unchanged. The browser flow test now checks all script references against the native allowlist and serves only allowed assets.
-
-## v1.12.0 — Wheelchair mounting calibration
-
-Calibrate → Wheelchair mounting · XYZ compensates an arbitrarily rotated, rigid sensor installation. First capture the empty, secured chair on a known level surface. Then capture it facing straight uphill on a supported 5–30° ramp, with no cross slope. Each capture requires at least 3 seconds of valid gravity and gyro samples, gyro magnitude ≤1°/s, gravity magnitude within 0.5 m/s² of standard gravity, and gravity direction within 0.2° of the window mean. These are stability checks, not an accuracy guarantee.
-
-The level unit vector defines chair Z in sensor coordinates. Project uphill gravity into the plane perpendicular to Z and normalize to obtain forward X; Y = Z × X. The resulting right-handed orthonormal matrix transforms every gravity vector before angles, 3D, stability checks, maps, and recording. X is forward, Y left, Z up; uphill Pitch remains positive. No ramp angle is required. Lateral tilt during forward capture cannot be detected from these two poses and biases the forward axis. Check level and an independent straight slope after saving.
-
-This determines all three *mounting* rotations, not compass heading or a live yaw measurement. Static gravity alone cannot determine forward from one pose. Linear acceleration can corrupt measurements; capture only while stationary. Use an empty chair and a supported ramp, not an occupied balancing maneuver.
-
-The matrix is saved through the existing phone zero storage and restored after launch. A successful mounting capture clears previous relative/reversal zeros; optional Set zero then operates in chair coordinates. Reversal capture is disabled while mounting is applied; clear mounting first to use it. Stop recording before changing mounting. Repositioning the sensor or changing chip calibration requires repeating mounting calibration. Firmware and BLE protocol are unchanged. Recorded samples include `zeroMethod: mount` and a matrix snapshot; CSV/HTML identify the zero method.
-
-Build: `./gradlew assembleDebug`; version 1.12.0 (23). Mathematical tests: `node tests/mount.test.cjs`. Hardware validation on the actual wheelchair is still required.
-
 ## v1.11.0 — Download offline maps in the app
 
 No manual map-package import is required. By default, the map fetches OpenFreeMap vector data online and stores it locally. After locating yourself or moving the map, select the control to download the area within 5 km of the map center at zoom levels 0–14. Once downloaded, you can disable online tile loading and pan or zoom offline. Zooming beyond level 14 magnifies existing vector content without adding detail. Fonts and rendering code are bundled; no online scripts or fonts are needed. Saved maps survive app restarts, but clearing app data or uninstalling deletes them. Failed downloads can be retried, existing tiles are reused, and downloads can be cancelled. Each area download is limited to 3,000 tiles and 50 MB, uses one request thread and an application-specific User-Agent. The actual coverage is an approximately 10 × 10 km rectangle calculated around the center coordinates. Download additional areas separately.

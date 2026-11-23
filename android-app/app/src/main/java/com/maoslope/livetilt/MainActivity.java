@@ -112,7 +112,7 @@ public final class MainActivity extends Activity implements BleClient.Listener {
                 }
                 if(url.startsWith("https://appassets.androidplatform.net/tiles/")) return mapTile(r.getUrl().getLastPathSegment(), r.getUrl().getPath());
                 String path = url.startsWith(ORIGIN) ? url.substring(ORIGIN.length()) : "";
-                if (path.equals("index.html") || path.equals("protocol.js") || path.equals("tracking.js") || path.equals("reversal.js") || path.equals("mount.js") || path.equals("vector.js") || path.equals("map.js") || path.equals("sessions.js")) {
+                if (path.equals("index.html") || path.equals("protocol.js") || path.equals("tracking.js") || path.equals("reversal.js") || path.equals("vector.js") || path.equals("map.js") || path.equals("sessions.js")) {
                     try { return new WebResourceResponse(path.endsWith(".js") ? "application/javascript" : "text/html",
                             "UTF-8", getAssets().open(path)); }
                     catch (IOException ignored) { }
