@@ -18,13 +18,13 @@ window.drawVectorTile=function(bytes){
  }
  function paint(c,x,y,size,zoom=14){c.save();c.translate(x,y);c.beginPath();c.rect(0,0,size,size);c.clip();c.fillStyle='#e9e5dc';c.fillRect(0,0,size,size);
  const labels=[];
- for(const name of ['landcover','landuse','park','water','waterway','building','transportation','transportation_name','place','poi']){
- const layer=tile.layers[name];if(!layer)continue;
- for(let i=0;i<layer.length;i++){const f=layer.feature(i),g=f.loadGeometry(),k=size/f.extent,p=f.properties;
- if(f.type===1||name==='transportation_name'){const pos=g[0]?.[Math.floor(g[0].length/2)],label=p['name:en']||p.name;if(pos&&label&&labelRule(name,p,zoom)){c.font=name==='place'?'bold 14px sans-serif':'12px sans-serif';labels.push({label,x:pos.x*k,y:pos.y*k,font:c.font,priority:priority(name,p)});}continue;}
- c.beginPath();for(const line of g){line.forEach((v,j)=>j?c.lineTo(v.x*k,v.y*k):c.moveTo(v.x*k,v.y*k));if(f.type===3)c.closePath();}
- if(f.type===3){c.fillStyle=name==='water'?'#9bcbdc':name==='building'?'#c7bcaf':'#c9d8b6';c.fill('evenodd');}
- else {c.strokeStyle=name==='waterway'?'#9bcbdc':['motorway','trunk','primary'].includes(p.class)?'#f2c46c':'#fff';c.lineWidth=name==='transportation'?(['motorway','trunk','primary'].includes(p.class)?5:2.5):1.5;c.stroke();}
+ for(const layerName of ['landcover','landuse','park','water','waterway','building','transportation','transportation_name','place','poi']){
+ const layer=tile.layers[layerName];if(!layer)continue;
+ for(let i=0;i<layer.length;i++){const feature=layer.feature(i),geometry=feature.loadGeometry(),k=size/feature.extent,properties=feature.properties;
+ if(feature.type===1||layerName==='transportation_name'){const pos=geometry[0]?.[Math.floor(geometry[0].length/2)],label=properties['name:en']||properties.name;if(pos&&label&&labelRule(layerName,properties,zoom)){c.font=layerName==='place'?'bold 14px sans-serif':'12px sans-serif';labels.push({label,x:pos.x*k,y:pos.y*k,font:c.font,priority:priority(layerName,properties)});}continue;}
+ c.beginPath();for(const line of geometry){line.forEach((v,j)=>j?c.lineTo(v.x*k,v.y*k):c.moveTo(v.x*k,v.y*k));if(feature.type===3)c.closePath();}
+ if(feature.type===3){c.fillStyle=layerName==='water'?'#9bcbdc':layerName==='building'?'#c7bcaf':'#c9d8b6';c.fill('evenodd');}
+ else {c.strokeStyle=layerName==='waterway'?'#9bcbdc':['motorway','trunk','primary'].includes(properties.class)?'#f2c46c':'#fff';c.lineWidth=layerName==='transportation'?(['motorway','trunk','primary'].includes(properties.class)?5:2.5):1.5;c.stroke();}
  }
  }
  labels.sort((a,b)=>a.priority-b.priority);const occupied=[];
