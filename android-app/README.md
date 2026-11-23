@@ -1,3 +1,9 @@
+## v1.12.2 — Explain mounting capture failures and accept gentle ramps
+
+Keep the same level + uphill method. Accept a 2–30° separation between captured gravity vectors (previously 5–30°). This is a change from the first reference, independent of sensor mounting orientation. Shallow 2–5° captures are more sensitive to noise. The forward pose must still have no cross slope, which this algorithm cannot verify. Rejections now state the measured angle and actual limit; they no longer imply that cross slope was detected. Live feedback shows tilt from step 1, stable readiness, sample duration, gyro motion, and gravity validity. Sensor XYZ axes need not be aligned physically. Two poses differing only in flat-ground heading cannot determine forward.
+
+Regression tests include arbitrary mounting at 4° forward tilt and a same-pose rejection followed by a successful gentle-ramp retry. Version 1.12.2 (25).
+
 ## v1.12.1 — Restore button initialization on Android
 
 Allow the bundled `mount.js` through the native WebView resource allowlist. In 1.12.0 this script was blocked, aborting initialization before navigation and connection handlers were registered. The existing two-pose mounting calibration is unchanged. The browser flow test now checks all script references against the native allowlist and serves only allowed assets.

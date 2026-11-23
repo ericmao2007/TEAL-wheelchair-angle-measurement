@@ -5,9 +5,11 @@ const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
 const valid=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 const unit=v=>{if(!valid(v)||Math.hypot(...v)<1e-6)throw Error('Invalid gravity vector');return v.map(x=>x/Math.hypot(...v));};
 function validate(m){return Array.isArray(m)&&m.length===3&&m.every(v=>valid(v)&&Math.abs(dot(v,v)-1)<1e-5)&&Math.abs(dot(m[0],m[1]))<1e-5&&Math.abs(dot(m[0],m[2]))<1e-5&&Math.abs(dot(m[1],m[2]))<1e-5&&dot(cross(m[0],m[1]),m[2])>.99999;}
+function separation(a,b){return Math.acos(Math.max(-1,Math.min(1,dot(unit(a),unit(b)))))*180/Math.PI;}
 function solve(level,noseUp){
- const z=unit(level),g=unit(noseUp),c=dot(z,g),angle=Math.acos(Math.max(-1,Math.min(1,c)))*180/Math.PI;
- if(angle<5||angle>30)throw Error('Use a straight uphill incline of 5–30°, without side tilt.');
+ const z=unit(level),g=unit(noseUp),c=dot(z,g),angle=separation(level,noseUp);
+ if(angle<2-1e-8)throw Error(`Measured change ${angle.toFixed(1)}°. Need at least 2° of forward tilt from step 1. Turning on flat ground is insufficient. Sensor axes may stay crooked.`);
+ if(angle>30+1e-8)throw Error(`Measured change ${angle.toFixed(1)}° exceeds 30°. Keep the sensor fixed and use a gentler supported forward incline; redo level if needed.`);
  const x=unit(g.map((v,i)=>v-c*z[i])),y=unit(cross(z,x));
  return [x,y,z];
 }
@@ -28,5 +30,5 @@ class StablePose{
   return mean;
  }
 }
-const api={solve,apply,validate,StablePose};if(typeof module==='object')module.exports=api;else root.MountCalibration=api;
+const api={solve,apply,validate,separation,StablePose};if(typeof module==='object')module.exports=api;else root.MountCalibration=api;
 })(globalThis);

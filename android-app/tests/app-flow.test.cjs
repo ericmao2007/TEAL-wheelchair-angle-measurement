@@ -28,7 +28,8 @@ const server=http.createServer((req,res)=>{const file=path.join(assets,path.base
  const feed=async(p,r=0)=>page.evaluate(frames=>frames.forEach(onNativeFrame),mountedFrames(p,r));
  await page.click('#calibrationBack');await page.click('#chooseMount');
  await feed(0);await page.click('#mountLevel');assert(await page.evaluate(()=>!!mountLevel));
- await feed(12);await page.click('#mountForward');assert(await page.evaluate(()=>!!mountMatrix&&!tare&&!reversal.applied));
+ await feed(0);await page.click('#mountForward');assert(await page.locator('#mountStatus').innerText().then(s=>s.includes('Measured change 0.0°')));assert(await page.evaluate(()=>!!mountLevel));
+ await feed(4);await page.waitForFunction(()=>document.getElementById('mountLive').textContent.includes('4.0°')&&document.getElementById('mountLive').textContent.includes('Ready')); await page.click('#mountForward');assert(await page.evaluate(()=>!!mountMatrix&&!tare&&!reversal.applied));
  await feed(-8,5);const result=await page.evaluate(()=>displayReading(latest.fusion_accel));assert(Math.abs(result.pitch+8)<.001);assert(Math.abs(result.roll-5)<.001);
  await page.reload();await page.evaluate(()=>onNativeState({state:'ready'}));await feed(0);assert(await page.evaluate(()=>!!mountMatrix));assert(Math.abs(await page.evaluate(()=>displayReading().pitch))<.001);
  await page.click('#calibrateTab');await page.click('#chooseMount');await page.screenshot({path:'/tmp/teal-mount-test/mount-preview.png',fullPage:true});
