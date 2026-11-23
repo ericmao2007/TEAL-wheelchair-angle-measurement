@@ -1,3 +1,11 @@
+## v1.12.3 — Visible calibration activity and actionable outcomes
+
+All calibration pages now show a live sensor update counter and sample age; active IMU/six-face/mounting/reversal workflows also show elapsed time or sample progress and their next action. Stale/disconnected data is explicitly marked instead of animating as though samples are still arriving. IMU saving lists missing quality/stability conditions; six-face calibration lists accepted count, remaining axes, and stationary readiness. Reversal and Set zero explain the reference/correction applied, or why capture is unavailable. Mounting keeps the existing two-pose algorithm and measured-angle/stability diagnostics.
+
+Device commands show requested → confirmed, device-reported rejection, disconnected-before-confirmation, or unconfirmed after eight seconds. The BLE protocol has no request identifiers, so an unchanged repeated response is reported as unconfirmed rather than assumed successful. No automatic retry is sent. Device errors without more detailed telemetry are described as such. Phone persistence failures are distinguished from calibration applied only for the current session. Zero no longer labels a rejected click as successful.
+
+Regression validation covers native WebView script routing, activity counters, IMU quality blockers and confirmation, command timeout, wrong-face rejection, six-face progress/save, phone storage failure, stale-data disabling, mounting, and responsive layouts. APK version 1.12.3 (26); no firmware/protocol change. Actual phone/sensor validation remains outstanding.
+
 ## v1.12.2 — Explain mounting capture failures and accept gentle ramps
 
 Keep the same level + uphill method. Accept a 2–30° separation between captured gravity vectors (previously 5–30°). This is a change from the first reference, independent of sensor mounting orientation. Shallow 2–5° captures are more sensitive to noise. The forward pose must still have no cross slope, which this algorithm cannot verify. Rejections now state the measured angle and actual limit; they no longer imply that cross slope was detected. Live feedback shows tilt from step 1, stable readiness, sample duration, gyro motion, and gravity validity. Sensor XYZ axes need not be aligned physically. Two poses differing only in flat-ground heading cannot determine forward.
